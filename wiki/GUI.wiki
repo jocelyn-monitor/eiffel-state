@@ -1,3 +1,6 @@
+#summary Description of visual editor GUI
+#labels Phase-Implementation
+
 == Introduction ==
 
 Proper GUI design is critical for the success of a visual software construction tool. People hate using them because the interface of any text editor, even the worst one, is typically still better than the interface of the world's best visual editor. Our goal is to design the interface of our visual editor in such a way that it will be easier to draw an STD in it than to draw STD on a piece of paper and then translate it into code using text editor.
