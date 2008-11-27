@@ -1,0 +1,11 @@
+#summary Main concepts of Automata-based programming
+#labels Phase-Design
+
+= Introduction =
+
+Main idea of Automata-based programming approach is following: there are controlled objects with states. State of object can be changed on some event fired in the system. This event can be fired as a reaction on user input, as well as a subsequent event fired while previous event is processed.
+
+
+= Details =
+
+*TBD*
