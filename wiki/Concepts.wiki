@@ -3,9 +3,14 @@
 
 = Introduction =
 
+*Object-oriented automata-based programming* is an approach to O-O software construction, in which entities with _complex_ (_state-dependent_) behavior are represented with _automated classes_.
+
+<wiki:comment>
 Main idea of Automata-based programming approach is following: there are controlled objects with states. State of object can be changed on some event fired in the system. This event can be fired as a reaction on user input, as well as a subsequent event fired while previous event is processed.
+</wiki:comment>
 
+= Complex behavior =
 
-= Details =
+Entities with _simple_ behavior always have the same _reaction_ for a certain _input_. In O-O world a class is a model of an entity with simple behavior: input correspond to feature names, reactions correspond to feature bodies.
 
-*TBD*
+<wiki:comment>In contrast, an entity with complex behavior</wiki:comment>
