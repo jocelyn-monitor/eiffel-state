@@ -31,7 +31,7 @@ The distinction between control and computational states is rather informal, it 
 
 Mathematically, control states can be either predicates on computational states or be orthogonal (add some new information). As an example of the first possibility, consider a bounded stack. It behaves differently, depending on whether it is 1) empty 2) full 3) neither empty nor full - so these could be its three control states. These states can be expressed as predicates on attributes "count" and "capacity", which are components of stack's computational state.
 
-As an example of the second possibility, consider alarmed clock, which has three control states: "Alarm off", "Alarm setting" and "Alarm on". Computational states of the clock is defined by current time, alarm time and whether the bell is ringing. From this one cannot determine, whether the alarm is on, off, or is being set.
+As an example of the second possibility, consider alarmed clock, which has three control states: "Alarm off", "Alarm setting" and "Alarm on". Computational states of the clock is defined by current time, alarm time and whether the bell is ringing. From these attributes one cannot determine, whether the alarm is on, off, or is being set.
 
 = Automated control object =
 
@@ -63,7 +63,7 @@ Main stages of design process can be described as follows:
 There are still many undecided questions and unsolved problems in Object-oriented Automata-based programming, e.g.:
   * Should the control object be implemented in a single separate class, or can there be multiple classes, used by the controller, or alternatively, can some features of the control object be implemented directly in the automated class?
   * Should a transition condition be a feature name followed by arbitrary boolean expression on control object queries or should it have a more restricted form: e.g. a feature name, followed by a conjunction of boolean queries on the control objects?
-  * Should a transition action be a single command on the control object, or a sequence of commands, or even have a more general structure, e.g., contain any instructions involving command on the control object. 
+  * Should a transition action be a single command on the control object, a set of commands, a sequence of commands, or even have a more general structure, e.g., contain any instructions involving command on the control object. 
   * Can an automated class have state-independent features? 
   * Can an automated class have queries? Should they be state-independent? So far we were only talking about actions on transitions that correspond to control object commands. If we allow state-dependent queries, we should introduce a special kind of "actions" that are not at all actions and correspond to queries on the control object. Furthermore, as queries should be pure, such actions may only appear on _loops_ (transitions from a state to itself).
   * How the features with arguments should be processed? Should the arguments be passed directly to the corresponding feature of the control object or should the arguments to a control object's feature be expressions over the initial arguments and computational state? Can the arguments appear in transition conditions?
