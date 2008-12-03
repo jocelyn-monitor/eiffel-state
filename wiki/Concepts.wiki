@@ -23,7 +23,7 @@ The idea behind Object-oriented Automata-based programming is to introduce a mod
 
 Every class has a set of _computational states_, which is the set of all combinations of its attributes values. This set, though essentially finite, is in most cases immensely large. Computational states typically differ from each other only quantitavely; we can say that the result of a feature call depends on the computational state, but not the action (the algorithm) that is being executed.
 
-In Automata-based programming for each entity with complex behavior in addition to the set of computational states, the set of control states is defined. As opposed to computational states, control states are typically few, and thus defined by enumeration. Each of them has a certain meaning and qualitatively differs from all the others. Control state defines an action that is performed as a reaction to a certain input, not only the result of this actions.
+In Automata-based programming for each entity with complex behavior in addition to the set of computational states, the set of control states is defined. As opposed to computational states, control states are typically few, and thus defined by enumeration. Each of them has a certain meaning and qualitatively differs from all the others. Control state defines an action that is performed as a reaction to a certain input, not only the result of this action.
 
 Abstract machines that are used in the theory of formal languages (Push-down automaton, Turing machine) give good examples of distinguishing between control and computational states: control states in this case are the states of their finite-state controller and the computational states are the states of the stack or the tape. 
 
