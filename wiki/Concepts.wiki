@@ -13,7 +13,7 @@ Main idea of Automata-based programming approach is following: there are control
 
 Entities with _simple_ behavior always have the same _reaction_ to a certain _input_. In O-O world a class is a model of an entity with simple behavior: inputs correspond to feature names, reactions correspond to feature bodies.
 
-In contrast, an entity with complex behavior can react differently to the same input, depending on the history. To capture this dependency, the notion of _control state_ is introduced. In presence of this notion the reaction of an entity with complex behavior depends only on the input and on the current control state. Reaction as function of input and state together with transitions between states is best expressed in a form of a _finite state transducer_ (finite automaton with output).
+In contrast, an entity with complex behavior can react differently to the same input, depending on the history. To capture this dependency, the notion of _control state_ is introduced. In presence of this notion the reaction of an entity with complex behavior depends only on the input and on current control state. Reaction as function of input and state together with transitions between states is best expressed in a form of a _finite state transducer_ (finite automaton with output).
 
 Entities with complex behavior are common in control and reactive systems, but there are also many examples from other kinds of software: network protocols, GUI elements, NPC in computer games and other AI-like problems, etc.
 
