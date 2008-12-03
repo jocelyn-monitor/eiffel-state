@@ -25,8 +25,16 @@ Every class has a set of _computational states_, which is the set of all combina
 
 In automata-based programming for each entity with complex behavior in addition to the set of computational states, the set of control states is defined. As opposed to computational states, control states are typically few, and thus defined by enumeration. Each of them has a certain meaning and qualitatively differs from all the others. Control state defines an action that is performed as a reaction to a certain input, not only the result of this actions.
 
+Abstract machines that are used in the theory of formal languages (Push-down automaton, Turing machine) give good examples of distinguishing between control and computational states: control states in this case are the states of their finite-state controller and the computational states are the states of the stack or the tape. 
+
 The distinction between control and computational states is rather informal, it is "in the eyes of the programmer". The choice of appropriate set of control states is one of the main design decisions when implementing an automated class; it is made individually for each entity with complex behavior.
 
 Mathematically, control states can be either predicates on computational states or be orthogonal (add some new information). As an example of the first possibility, consider a bounded stack. It behaves differently, depending on whether it is 1) empty 2) full 3) neither empty, nor full - so these could be its three control states. These states can be expressed as predicates on attributes "count" and "capacity", which are component of stack's computational state.
 
-As an example of the second possibility, consider alarmed clock, which has three control states: "Alarm off", "Alarm setting" and "Alarm on". Computational states of the clock is defined by current time, alarm time and whether the bell is ringing. From this one cannot determine, whether the alarm is on, off, or is being set. 
+As an example of the second possibility, consider alarmed clock, which has three control states: "Alarm off", "Alarm setting" and "Alarm on". Computational states of the clock is defined by current time, alarm time and whether the bell is ringing. From this one cannot determine, whether the alarm is on, off, or is being set.
+
+= Automated control object =
+
+= Design process =
+
+= Unsolved problems = 
