@@ -43,7 +43,9 @@ The logic part is called the _controller_ and the semantic part - the _controlle
 
 The choice of the level of abstraction for the control object is closely connected with the choice of control states. Control object that is too abstract leads to to less control states, but complicates the control object itself, bringing to nothing the advantages of automata_based programming. Control object that is too concrete leads to more control states, making the controller too complex.
 
-Automated class looks like a normal class from the client's point of view. This is a very important property, which allows integrating automata-based implementations of entities with complex behavior into an existing O-O system, rather then redesigning the whole system from scratch in automata-based style. This means that the automated class, like any normal class, has a set of features, which can be called by clients on any instance of that class. However, the exact feature body to execute will be determined not only based on the feature name, but also on the current control state. 
+Automated class looks like a normal class from the client's point of view. This is a very important property, which allows integrating automata-based implementations of entities with complex behavior into an existing O-O system, rather then redesigning the whole system from scratch in automata-based style. This means that the automated class, like any normal class, has a set of features, which can be called by clients on any instance of that class. However, the exact feature body to execute will be determined not only based on the feature name, but also on the current control state.
+
+<wiki:comment>add about passive Mealy and stuff</wiki:comment> 
 
 = Design process =
 
@@ -57,3 +59,10 @@ Main stages of design process can be described as follows:
   # If no tool-support is available, the controller is implemented using one of the known patterns. Otherwise, STD itself is an implementation for the controller.
 
 = Unsolved problems = 
+
+There are still many undecided questions and unsolved problems in Object-oriented Automata-based programming, e.g.:
+  * Should the control object be implemented in a single separate class, or can there be multiple classes, used by the controller, or alternatively, can some features of the control object be implemented directly in the automated class?
+  * Should a transition condition be a feature name followed by arbitrary boolean expression on control object queries or should it have a more restricted form: e.g. a feature name, followed by a conjunction of boolean queries on the control objects?
+  * Should a transition action be a single command on the control object, or a sequence of commands, or even have a more general structure, e.g., contain any instructions involving command on the control object. 
+  * Can an automated class have state-independent features? 
+  * Can an automated class have queries? Should they be state-independent? So far we were only talking about actions on transitions that correspond to control object commands. If we allow state-dependent queries, we should introduce a special kind of "actions" that are not at all actions and correspond to queries on the control object. Furthermore, as queries should be pure, such actions may only appear on _loops_ (transitions from a state to itself).
