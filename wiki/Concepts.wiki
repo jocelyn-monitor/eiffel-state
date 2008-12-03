@@ -51,6 +51,9 @@ To make seamless integration with existing O-O systems possible, automata-based-
 
 Main stages of design process can be described as follows:
   # Object decomposition: the problem domain is decomposed into the set of interacting entities.
-  # From all the system entities, entities with complex behavior are extracted.
+  # From all the system entities, entities with complex behavior are extracted. For these entities the automata-based approach is used. All the other entities are designed and implemented by means of standard O-O techniques.
+  # For each entity with complex behavior a set of control states is identified; transitions between states are defined; for each transition a condition and an action is specified. The best way to specify the controller is the graphical approach using state-transition diagrams (STD).  
+  # Control object is constructed in such a way that it offers commands that are used in transition actions and queries that are used in transition conditions. The control object can be specified and implemented using standard O-O techniques.
+  # If no tool-support is available, the controller is implemented using one of the known patterns. Otherwise, STD itself is an implementation for the controller.
 
 = Unsolved problems = 
