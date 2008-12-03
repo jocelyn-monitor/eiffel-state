@@ -47,4 +47,10 @@ Automated class looks like a normal class from the client's point of view. This 
 
 = Design process =
 
+To make seamless integration with existing O-O systems possible, automata-based-specific features are introduces only on later stages of the design process and don't cross the boundaries of individual module.
+
+Main stages of design process can be described as follows:
+  # Object decomposition: the problem domain is decomposed into the set of interacting entities.
+  # From all the system entities, entities with complex behavior are extracted.
+
 = Unsolved problems = 
