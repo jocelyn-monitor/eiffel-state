@@ -45,7 +45,7 @@ The choice of the level of abstraction for the control object is closely connect
 
 Automated class looks like a normal class from the client's point of view. This is a very important property, which allows integrating automata-based implementations of entities with complex behavior into an existing O-O system, rather then redesigning the whole system from scratch in automata-based style. This means that the automated class, like any normal class, has a set of features, which can be called by clients on any instance of that class. However, the exact feature body to execute will be determined not only based on the feature name, but also on the current control state.
 
-<wiki:comment>add about passive Mealy and stuff</wiki:comment> 
+Compared to other automata-based models, automated control object is passive (that is it makes a step only when it is asked to), it is based on the Mealy automaton (that is, the actions depend not only on states, but also on the inputs), it has a feedback (predicates on computational state can be used in transition conditions), but it is also open (unlike e.g. Turing machine, in which the controller only receives information from the control object, automated control object receives inputs from its clients). 
 
 = Design process =
 
@@ -66,3 +66,5 @@ There are still many undecided questions and unsolved problems in Object-oriente
   * Should a transition action be a single command on the control object, or a sequence of commands, or even have a more general structure, e.g., contain any instructions involving command on the control object. 
   * Can an automated class have state-independent features? 
   * Can an automated class have queries? Should they be state-independent? So far we were only talking about actions on transitions that correspond to control object commands. If we allow state-dependent queries, we should introduce a special kind of "actions" that are not at all actions and correspond to queries on the control object. Furthermore, as queries should be pure, such actions may only appear on _loops_ (transitions from a state to itself).
+  * How the features with arguments should be processed? Should the arguments be passed directly to the corresponding feature of the control object or should the arguments to a control object's feature be expressions over the initial arguments and computational state? Can the arguments appear in transition conditions?
+  * How do we write contracts for state-dependent features? Should it be something like behavioral inheritance, i.e. that the contract of the state-dependent feature is weaker than all the contracts of control object's features that can be reactions to it. Or should we rather use the similar technique as for agent calls with abstract "precondition" query that can be checked without knowing what it really is?    
