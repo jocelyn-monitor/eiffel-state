@@ -8,12 +8,12 @@ Acquaintance with theory:
 Due date: end of Dec 2008
 
 Library architecture
-  Determining interface and implementation of library
-  Creating sample application which use library's interface
+ Determining interface and implementation of library
+ Creating sample application which use library's interface
 Due date: middle of Jar 2009
 
-First usable version
+First usable version<br/>
 Due date: end of Feb 2009
 
-Final version with user documentation
+Final version with user documentation<br/>
 Due date: end of Apr 2009
