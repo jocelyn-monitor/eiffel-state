@@ -5,7 +5,7 @@
 
 This page is approximate plan, target of which is developing library for direct support of constructing controllers (automatons) for [Concepts automated control object]s in Eiffel programming language.
 
-= Planned Deliviries =
+= Planned Deliveries =
 
 == 1. Acquantance with theory and Eiffel language ==
   * Reading of "Object-Oriented Software Construction" by Bertrand Meyer.
@@ -49,4 +49,3 @@ This page is approximate plan, target of which is developing library for direct 
 
 = In addition =
 Critisism are welcome in comments.
-
