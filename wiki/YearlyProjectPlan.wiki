@@ -1,18 +1,19 @@
 #summary Plan for library realization with preliminary due dates.
+#labels Education-Plan
 
-# Acquaintance with theory:
-#* "Object-Oriented Software Construction" written by Bertrand Meyer
-#* Articles on website http://is.ifmo.ru/english/
-#* Presentation on Automata-based programming made by Nadia Polikarpova
-# Due date: end of Dec 2008
+Acquaintance with theory:
+  "Object-Oriented Software Construction" written by Bertrand Meyer
+  Articles on website http://is.ifmo.ru/english/
+  Presentation on Automata-based programming made by Nadia Polikarpova
+Due date: end of Dec 2008
 
-# Library architecture
-#* Determining interface and implementation of library
-#* Creating sample application which use library's interface
-# Due date: middle of Jar 2009
+Library architecture
+  Determining interface and implementation of library
+  Creating sample application which use library's interface
+Due date: middle of Jar 2009
 
-# First usable version
-# Due date: end of Feb 2009
+First usable version
+Due date: end of Feb 2009
 
-# Final version with user documentation
-# Due date: end of Apr 2009
+Final version with user documentation
+Due date: end of Apr 2009
