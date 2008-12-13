@@ -1,19 +1,22 @@
 #summary Plan for library realization with preliminary due dates.
 #labels Education-Plan
 
-*Acquaintance with theory*:
-  * "Object-Oriented Software Construction" written by Bertrand Meyer
-  * Articles on website http://is.ifmo.ru/english/
+=== Acquaintance with theory ===
+Eiffel, IDE and special materials:
+  * "_Object-Oriented Software Construction_" written by Bertrand Meyer
   * Presentation on Automata-based programming made by Nadia Polikarpova
+  * Articles on http://is.ifmo.ru/english/
 Date: end of Dec 2008
 
-*Library architecture*
-  * Determining interface and implementation of library
+=== Library architecture ===
+  * Determining interface of the library. It will help D.Kochelaev to design STD-to-code conversion and and develop it simultaneously with library.
   * Creating sample application which use library's interface
 Date: middle of Jar 2009
 
-*First usable version*<br/>
+=== First usable version ===
 Date: end of Feb 2009
 
-*Final version with user documentation*<br/>
+=== Final version ===
+  * Both library and visual editor completed
+  * User documentation
 Date: end of Apr 2009
