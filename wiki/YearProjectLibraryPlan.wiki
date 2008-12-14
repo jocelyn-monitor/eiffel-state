@@ -8,8 +8,8 @@ This page is approximate plan, target of which is developing library for direct 
 = Planned Deliveries =
 
 == 1. Acquantance with theory and Eiffel language ==
-   * Reading of Object-Oriented Software Construction by Bertrand Meyer.
-   * Reading necessary for understanding articles on htppis.ifmo.ru. (particulary [http://is.ifmo.ru/disser/shopyrin_disser.pdf Stool], [http://is.ifmo.ru/papers/anaumov LOCOL])
+   * Reading "Object-Oriented Software Construction" by Bertrand Meyer.
+   * Reading necessary for understanding articles at http://is.ifmo.ru/. (particulary [http://is.ifmo.ru/disser/shopyrin_disser.pdf Stool], [http://is.ifmo.ru/papers/anaumov LOCOL])
    * Reading and understanding automaton programming book by Nadia Polikarpova and Anatoly Shalyto.
    * Meeting with Dmitry Kochelaev in SPbSU ITMO to discuss project.
 
@@ -17,7 +17,7 @@ This page is approximate plan, target of which is developing library for direct 
 
 == 2. Writing program on Eiffel in Eiffel Studio ==
    * Program will be something like simple Graph class (based on adjancency matrix or adjancency lists) and client that uses this class(for instance Dijkstra's algorithm).
-   * Get more close relationships with EiffelStudio -)
+   * Get more close relationships with EiffelStudio :-)
    * Sending it to Nadya for checking.
 
   Date: end of session/start of Feb'09
@@ -40,8 +40,8 @@ This page is approximate plan, target of which is developing library for direct 
   Date: end of Jun'09
 
 == 6. Preparing user documentation ==
-   * It would be simultaneous with Shalyto's documentation stage(i.e. previous).
-   * Doing some simple(or maybe complicated) site for our project.
+   * It would be simultaneous with Shalyto's documentation stage (i.e. previous).
+   * Doing some simple (or maybe complicated) site for our project.
   Date: end of Apr'09
 
 == 7. PROFIT ==
