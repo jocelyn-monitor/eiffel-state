@@ -1,0 +1,11 @@
+#summary Description and design of Tic-Tac-Toe game
+#labels Unfinished
+
+= Introduction =
+
+Here you can find description of Tic-Tac-Toe game and its implementation with eiffel-state library.
+
+
+= Brief Game Rules =
+
+It's a step-by-step game for two players. It is played on 3x3 field.
