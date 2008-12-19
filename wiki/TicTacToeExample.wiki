@@ -8,4 +8,9 @@ Here you can find description of Tic-Tac-Toe game and its implementation with ei
 
 = Brief Game Rules =
 
-It's a step-by-step game for two players. It is played on 3x3 field.
+It's a step-by-step game for two players. It is played on 3x3 field. The aim of the game is to put three O or three X in a row. A person who plays with X turns first.
+
+
+= Model description =
+
+Each cell of the field is a button with complex behavior (three states empty, X and O). The game process itself is also an object with complex behavior (states are: before, X-turn, O-turn, X-won, O-won and draw).
