@@ -247,6 +247,10 @@ feature {NONE} -- Game over checks
 			end
 		end
 
+
+
+feature {NONE} -- Implementation, requests
+
 	request_new_game is
 			-- The user ended the game
 		local
@@ -281,10 +285,6 @@ feature {NONE} -- Game over checks
 			end
 		end
 
-
-
-feature {NONE} -- Implementation, Close event
-
 	request_close_window is
 			-- The user wants to close the window
 		local
@@ -307,13 +307,16 @@ feature {NONE} -- Implementation
 			-- Main container (contains all widgets displayed in this window)
 
 	vertical_boxes: ARRAY[EV_VERTICAL_BOX]
+			-- vertical boxes to be put into `main_container'
 
 	buttons: ARRAY[ARRAY[EV_BUTTON]]
+			-- nine buttons
 
 	game_field: GAME_FIELD
+			-- game field, which stores the value of crosses and circles
 
 	current_turn: INTEGER
-
+			-- curren player, either cross, or circle
 
 
 	on_button_click(i: INTEGER; j: INTEGER) is
@@ -350,7 +353,6 @@ feature {NONE} -- Implementation
 			current_turn := -1
 
 			create main_container
-
 			create vertical_boxes.make (0, 2)
 			create buttons.make (0, 2)
 
