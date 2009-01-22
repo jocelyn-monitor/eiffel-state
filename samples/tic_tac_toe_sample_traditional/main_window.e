@@ -54,55 +54,20 @@ feature {NONE} -- Initialization
 				(title.is_equal (Window_title))
 		end
 
+feature {NONE} -- Game over checks
 
-feature {NONE} -- Implementation, Close event
-
-	request_close_window is
-			-- The user wants to close the window
-		local
-			question_dialog: EV_CONFIRMATION_DIALOG
-		do
-			create question_dialog.make_with_text (Label_confirm_close_window)
-			question_dialog.show_modal_to_window (Current)
-
-			if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
-					-- Destroy the window
-				destroy;
-
-					-- End the application
-					--| TODO: Remove this line if you don't want the application
-					--|       to end when the first window is closed..
-				(create {EV_ENVIRONMENT}).application.destroy
-			end
-		end
-
-feature {NONE} -- Implementation
-
-	main_container: EV_HORIZONTAL_BOX
-			-- Main container (contains all widgets displayed in this window)
-
-	vertical_boxes: ARRAY[EV_VERTICAL_BOX]
-
-	buttons: ARRAY[ARRAY[EV_BUTTON]]
-
-	game_field: GAME_FIELD
-
-	current_turn: INTEGER
-
-	is_game_over is
-			-- Checks if game is over and shows request to start a new one
+	check_horizontal: INTEGER is
+			-- Check if there is winning combination on horizontal line
 		require
 			game_field /= Void
 		local
-			question_dialog: EV_CONFIRMATION_DIALOG
 			i: INTEGER
 			j: INTEGER
 			value: INTEGER
 			did_not_win: BOOLEAN
-			won: INTEGER
 		do
-			won := game_field.Empty_id
-			-- check horizontal
+			result := game_field.Empty_id
+
 			from
 				i := 0
 			until
@@ -123,12 +88,25 @@ feature {NONE} -- Implementation
 				end
 
 				if did_not_win = false then
-					won := value
+					result := value
 					i := 2
 				end
 				i := i + 1
 			end
-			-- check vertical
+		end
+
+	check_vertical: INTEGER is
+			-- Check if there is winning combination on vertical line
+		require
+			game_field /= Void
+		local
+			i: INTEGER
+			j: INTEGER
+			value: INTEGER
+			did_not_win: BOOLEAN
+		do
+			result := game_field.Empty_id
+
 			from
 				i := 0
 			until
@@ -148,12 +126,24 @@ feature {NONE} -- Implementation
 					j := j + 1
 				end
 				if did_not_win = false then
-					won := value
+					result := value
 					i := 2
 				end
 				i := i + 1
 			end
-			-- check diagonals
+		end
+
+	check_diagonals: INTEGER is
+			-- Check if there is winning combination on diagonals line
+		require
+			game_field /= Void
+		local
+			i: INTEGER
+			value: INTEGER
+			did_not_win: BOOLEAN
+		do
+			result := game_field.Empty_id
+
 			value := game_field.get (0, 0)
 			did_not_win := false
 			from
@@ -168,7 +158,7 @@ feature {NONE} -- Implementation
 				i := i + 1
 			end
 			if did_not_win = false then
-				won := value
+				result := value
 			end
 			value := game_field.get (0, 2)
 			did_not_win := false
@@ -184,9 +174,21 @@ feature {NONE} -- Implementation
 				i := i + 1
 			end
 			if did_not_win = false then
-				won := value
+				result := value
 			end
-			-- check draw
+		end
+
+	check_draw: INTEGER is
+			-- Check if there is winning combination on diagonals line
+		require
+			game_field /= Void
+		local
+			i: INTEGER
+			j: INTEGER
+			did_not_win: BOOLEAN
+		do
+			result := game_field.Empty_id
+
 			did_not_win := false
 			from
 				i := 0
@@ -210,37 +212,109 @@ feature {NONE} -- Implementation
 				i := i + 1
 			end
 			if did_not_win = false then
-				won := -2 --draw
+				result := -2 --draw
+			end
+		end
+
+	is_game_over is
+			-- Checks if game is over and shows request to start a new one
+		require
+			game_field /= Void
+		local
+			won: INTEGER
+		do
+
+			won := game_field.Empty_id
+			-- check horizontal
+			if won = game_field.Empty_id  then
+				won := check_horizontal
+			end
+			-- check vertical
+			if won = game_field.Empty_id  then
+				won := check_vertical
+			end
+			-- check diagonals
+			if won = game_field.Empty_id  then
+				won := check_diagonals
+			end
+			-- check draw
+			if won = game_field.Empty_id  then
+				won := check_draw
 			end
 			-- check if somebody won
 			if won /= game_field.Empty_id then
-				create question_dialog.make_with_text ("Game is over. Play again?")
-				question_dialog.show_modal_to_window (Current)
-
-				if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
-					from
-						i := 0
-					until
-						i = 3
-					loop
-						from
-							j := 0
-						until
-							j = 3
-						loop
-							buttons.item (i).item (j).set_text ("");
-							j := j + 1
-						end
-						i := i + 1
-					end
-
-					create game_field.make
-				else
-					destroy;
-					(create {EV_ENVIRONMENT}).application.destroy
-				end
+				request_new_game
 			end
 		end
+
+	request_new_game is
+			-- The user ended the game
+		local
+			question_dialog: EV_CONFIRMATION_DIALOG
+			i: INTEGER
+			j: INTEGER
+		do
+			create question_dialog.make_with_text (Label_confirm_new_game)
+			question_dialog.show_modal_to_window (Current)
+
+			if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
+				from
+					i := 0
+				until
+					i = 3
+				loop
+					from
+						j := 0
+					until
+						j = 3
+					loop
+						buttons.item (i).item (j).set_text ("");
+						j := j + 1
+					end
+					i := i + 1
+				end
+
+				create game_field.make
+			else
+				destroy;
+				(create {EV_ENVIRONMENT}).application.destroy
+			end
+		end
+
+
+
+feature {NONE} -- Implementation, Close event
+
+	request_close_window is
+			-- The user wants to close the window
+		local
+			question_dialog: EV_CONFIRMATION_DIALOG
+		do
+			create question_dialog.make_with_text (Label_confirm_close_window)
+			question_dialog.show_modal_to_window (Current)
+
+			if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
+					-- Destroy the window
+				destroy;
+
+				(create {EV_ENVIRONMENT}).application.destroy
+			end
+		end
+
+feature {NONE} -- Implementation
+
+	main_container: EV_HORIZONTAL_BOX
+			-- Main container (contains all widgets displayed in this window)
+
+	vertical_boxes: ARRAY[EV_VERTICAL_BOX]
+
+	buttons: ARRAY[ARRAY[EV_BUTTON]]
+
+	game_field: GAME_FIELD
+
+	current_turn: INTEGER
+
+
 
 	on_button_click(i: INTEGER; j: INTEGER) is
 			-- Process i j button click
@@ -261,61 +335,6 @@ feature {NONE} -- Implementation
 				is_game_over
 			end
 
-		end
-
-
-	on_0_0_button_click is
-			-- Process 0 0 button click		
-		do
-			on_button_click (0, 0)
-		end
-
-	on_0_1_button_click is
-			-- Process 0 1 button click
-		do
-			on_button_click (0, 1)
-		end
-
-	on_0_2_button_click is
-			-- Process 0 2 button click
-		do
-			on_button_click (0, 2)
-		end
-
-	on_1_0_button_click is
-			-- Process 1 0 button click
-		do
-			on_button_click (1, 0)
-		end
-
-	on_1_1_button_click is
-			-- Process 1 1 button click
-		do
-			on_button_click (1, 1)
-		end
-
-	on_1_2_button_click is
-			-- Process 1 2 button click
-		do
-			on_button_click (1, 2)
-		end
-
-	on_2_0_button_click is
-			-- Process 2 0 button click
-		do
-			on_button_click (2, 0)
-		end
-
-	on_2_1_button_click is
-			-- Process 2 1 button click
-		do
-			on_button_click (2, 1)
-		end
-
-	on_2_2_button_click is
-			-- Process 2 2 button click
-		do
-			on_button_click (2, 2)
 		end
 
 	build_main_container is
@@ -342,23 +361,7 @@ feature {NONE} -- Implementation
 			loop
 				create buttons_column.make (0, 2)
 				buttons.item (i) := buttons_column
-				from
-					j := 0
-				until
-					j = 3
-				loop
-					create button
-					buttons.item (i).item (j) := button
-					j := j + 1
-				end
-				i := i + 1
-			end
 
-			from
-				i := 0
-			until
-				i = 3
-			loop
 				vertical_boxes.put (create {EV_VERTICAL_BOX}, i)
 				main_container.extend (vertical_boxes.item (i))
 				from
@@ -366,21 +369,15 @@ feature {NONE} -- Implementation
 				until
 					j = 3
 				loop
+					create button
+					buttons.item (i).item (j) := button
+					button.select_actions.extend (agent on_button_click (i, j))
 					vertical_boxes.item (i).extend (buttons.item (i).item (j))
 					j := j + 1
 				end
-				i := i + 1;
-		    end
+				i := i + 1
+			end
 
-			buttons.item (0).item (0).select_actions.extend (agent on_0_0_button_click)
-			buttons.item (0).item (1).select_actions.extend (agent on_0_1_button_click)
-			buttons.item (0).item (2).select_actions.extend (agent on_0_2_button_click)
-			buttons.item (1).item (0).select_actions.extend (agent on_1_0_button_click)
-			buttons.item (1).item (1).select_actions.extend (agent on_1_1_button_click)
-			buttons.item (1).item (2).select_actions.extend (agent on_1_2_button_click)
-			buttons.item (2).item (0).select_actions.extend (agent on_2_0_button_click)
-			buttons.item (2).item (1).select_actions.extend (agent on_2_1_button_click)
-			buttons.item (2).item (2).select_actions.extend (agent on_2_2_button_click)
 			create game_field.make
 		ensure
 			main_container_created: main_container /= Void

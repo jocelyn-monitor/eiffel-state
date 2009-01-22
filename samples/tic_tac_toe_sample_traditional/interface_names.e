@@ -16,4 +16,8 @@ feature -- Access
 			-- String for the confirmation dialog box that appears
 			-- when the user try to close the first window.
 
+	Label_confirm_new_game: STRING is "Game is over. Play again?"
+			-- String for the confirmation dialog box for
+			-- new game
+
 end -- class INTERFACE_NAMES
