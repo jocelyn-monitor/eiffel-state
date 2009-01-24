@@ -233,7 +233,7 @@ feature {NONE} -- Implementation
 
 invariant
 	field_exists: field /= Void
-	filed_width_correct: field.width = Dimension
+	field_width_correct: field.width = Dimension
 	field_height_correct: field.height = Dimension
 	field_cells_valid: field.for_all (agent valid_code)
 	current_turn_one_of_two: current_turn = Cross_code or current_turn = Circle_code
