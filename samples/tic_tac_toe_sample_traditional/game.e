@@ -12,11 +12,13 @@ create
 
 feature {NONE} -- Initialization
 
-	make is
+	make (first_turn: INTEGER) is
 			-- Create an empty field
+		require
+			first_turn_one_of_two: first_turn = Cross_Code or first_turn = Circle_code
 		do
 			create field.make (Dimension, Dimension)
-			current_turn := Cross_code
+			current_turn := first_turn
 		ensure
 			field_empty: field.for_all (agent (x: INTEGER): BOOLEAN do Result := x = Empty_code end)
 		end

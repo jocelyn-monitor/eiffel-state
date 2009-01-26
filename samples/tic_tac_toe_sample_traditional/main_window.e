@@ -30,7 +30,8 @@ feature {NONE} -- Initialization
 		do
 			Precursor {EV_TITLED_WINDOW}
 
-			create game.make
+			first_turn := {GAME}.Cross_code
+			create game.make (first_turn)
 			build_main_container
 			extend (main_container)
 
@@ -48,6 +49,9 @@ feature {NONE} -- Initialization
 feature {NONE} -- Model
 	game: GAME
 			-- Game
+
+	first_turn: INTEGER
+			-- First turn in current game
 
 	string_representation: ARRAY [STRING] is
 			-- String representation of cell values
@@ -144,7 +148,12 @@ feature {NONE} -- View
 			question_dialog.show_modal_to_window (Current)
 
 			if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
-				create game.make
+				if first_turn = {GAME}.Cross_code then
+					first_turn := {GAME}.circle_code
+				else
+					first_turn := {GAME}.Cross_code
+				end
+				create game.make (first_turn)
 				update_buttons
 			else
 				close_window
@@ -177,6 +186,7 @@ feature {NONE} -- Constants
 
 invariant
 	game_exists: game /= Void
+	first_turn_one_of_two: first_turn = {GAME}.Cross_code or first_turn = {GAME}.Circle_code
 	main_container_exists: main_container /= Void
 	buttons_exists: buttons /= Void
 	each_button_exists: not buttons.has (Void)
