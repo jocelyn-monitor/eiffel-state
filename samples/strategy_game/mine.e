@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {MINE}."
+	description: "Mines that produce gold."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -8,15 +8,25 @@ class
 	MINE
 
 inherit
-	BUILDING
+	PRODUCTION
+		rename
+			last_resource as last_gold
+		redefine
+			last_gold
+		end
 
-create
+create {WORKER}
 	make
 
 feature -- Access
-	get_type : STRING is
-		do
-			Result := "Mine"
-		end
+	type : STRING is "Mine"
 
+	last_gold: GOLD
+
+feature -- Basic operation
+	produce is
+			-- Produce resource and store it into `last_resource'
+		do
+			create last_gold
+		end
 end

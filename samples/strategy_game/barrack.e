@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {BARRACK}."
+	description: "Barracks that train soldiers."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -10,18 +10,21 @@ class
 inherit
 	BUILDING
 
-create
+create {WORKER}
 	make
 
 feature -- Access
-	get_type : STRING is
-		do
-			Result := "Barrack"
-		end
+	type: STRING is "Barrack"
 
-	train_soldier : SOLDIER is
+	last_soldier: SOLDIER
+			-- Last trained soldier
+
+feature -- Basic operations
+	train_soldier is
 		do
-			create Result.make (get_position)
-			io.put_string (Result.to_string + " was trained%N")
+			create last_soldier.make (position)
+			io.put_string (last_soldier.out + " was trained%N")
+		ensure
+			last_soldier_exists: last_soldier /= Void
 		end
 end

@@ -6,15 +6,12 @@ indexing
 class
     APPLICATION
 
-inherit
-    ARGUMENTS
-
 create
     make
 
 feature {NONE} -- Initialization
 
-    make () is
+    make is
             -- Run application.
         local
             hall : HALL
@@ -22,73 +19,71 @@ feature {NONE} -- Initialization
             mine : MINE
             sawmill : SAWMILL
 
-            hall_position : POSITION
-            barrack_position : POSITION
-            mine_position : POSITION
-            sawmill_position : POSITION
-            forest_coordinates : POSITION
-
-            workers : ARRAY[WORKER]
-            soldiers : ARRAY[SOLDIER]
+            workers : ARRAY [WORKER]
+            soldiers : ARRAY [SOLDIER]
             powerful_hero : HERO
+            resources : LINKED_LIST [RESOURCE]
 
-            resources : ARRAY[RESOURCE]
-
-            counter : INTEGER
+			forest_position: POSITION
+            i: INTEGER
         do
-            create hall_position.make (0.0, 0.0)
-            create hall.make(hall_position)
+            create hall.make
 
-            powerful_hero := hall.train_hero
+			hall.train_hero
+            powerful_hero := hall.last_hero
 
-            create workers.make (0, 2)
+            create workers.make (1, 3)
             from
-                counter := 0
+                i := 1
             until
-                counter = 3
+                i > 3
             loop
-                workers.put (hall.train_worker, counter)
-                counter := counter + 1
+            	hall.train_worker
+                workers.put (hall.last_worker, i)
+                i := i + 1
             end
 
-            create barrack_position.make (1.0, 0.0)
-            barrack ?= workers.item (0).build_barrack (barrack_position)
+			workers.item (1).build_barrack (create {POSITION}.make (1,0))
+            barrack := workers.item (1).last_barrack
 
-            create soldiers.make (0, 10)
+            create soldiers.make (1, 10)
             from
-                counter := 0
+                i := 1
             until
-                counter = 11
+                i > 10
             loop
-                soldiers.put (barrack.train_soldier, counter)
-                counter := counter + 1
+            	barrack.train_soldier
+                soldiers.put (barrack.last_soldier, i)
+                i := i + 1
             end
 
-            create mine_position.make (1.0, 1.0)
-            mine ?= workers.item (1).build_mine (mine_position)
+			workers.item (2).build_mine (create {POSITION}.make (1, 1))
+            mine := workers.item (2).last_mine
 
-            create sawmill_position.make (0.0, 1.0)
-            sawmill ?= workers.item (2).build_sawmill (sawmill_position)
+			workers.item (3).build_sawmill (create {POSITION}.make (0, 1))
+            sawmill := workers.item (3).last_sawmill
 
-            create forest_coordinates.make (-2.0, 0.0)
+            create forest_position.make (-2, 0)
 
-            create resources.make (0, 1)
+            create resources.make
             from
-                counter := 0
+                i := 1
             until
-                counter = 3
+                i > 3
             loop
-                resources.put (workers.item (counter).collect_lumber (forest_coordinates, sawmill), 0)
-                counter := counter + 1
+            	workers.item (i).collect_lumber (forest_position, sawmill)
+                resources.extend (sawmill.last_lumber)
+                i := i + 1
             end
 
             from
-                counter := 0
+                i := 1
             until
-                counter = 3
+                i > 3
             loop
-                resources.put (workers.item (counter).collect_gold (mine), 1)
-                counter := counter + 1
+            	workers.item (i).collect_gold (mine)
+                resources.extend (mine.last_gold)
+                i := i + 1
             end
         end
 

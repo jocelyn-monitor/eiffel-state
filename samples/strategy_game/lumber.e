@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {LUMBER}."
+	description: "Lumber."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -9,8 +9,5 @@ class
 
 inherit
 	RESOURCE
-
-create
-	make
 
 end
