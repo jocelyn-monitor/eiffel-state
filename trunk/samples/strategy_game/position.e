@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {POSITION}."
+	description: "Positions in the game world."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -7,54 +7,59 @@ note
 class
 	POSITION
 
+inherit
+	ANY
+		redefine
+			out
+		end
+
 create
-	make
+	make,
+	make_origin
+
+feature -- Initialization
+	make (new_x, new_y: DOUBLE) is
+			-- Set `x' to `new_x' and `y' to `new_y'
+		require
+			not_too_far: (new_x - Origin.x) ^ 2 + (new_y - Origin.y) ^ 2 <= Radius
+		do
+			x := new_x
+			y := new_y
+		ensure
+			x_set: x = new_x
+			y_set: y = new_y
+		end
+
+	make_origin is
+			-- Create an origin point
+		do
+		ensure
+			x_set: x = 0.0
+			y_set: y = 0.0
+		end
 
 feature -- Access
-	get_x : DOUBLE is
-		do
-			Result := x
-		ensure
-			equal_values : Result = x
+	x : DOUBLE
+
+	y : DOUBLE
+
+	Origin: POSITION is
+			-- Origin of the world
+		once
+			create Result.make_origin
 		end
 
-	get_y : DOUBLE is
-		do
-			Result := y
-		ensure
-			equal_values : Result = y
-		end
+	Radius: DOUBLE is 1000.0
+			-- World radius
 
-	to_string : STRING is
-			-- String in form (x, y)
+
+feature -- Output
+	out: STRING is
+			-- String representation in form (`x', `y')
 		do
 			Result := "(" + x.out + ", " + y.out + ")"
 		end
 
-feature -- Element change
-	set_x(new_x : DOUBLE) is
-		do
-			x := new_x
-		end
-
-	set_y(new_y : DOUBLE) is
-		do
-			y := new_y
-		end
-
-feature {NONE} -- Implementation
-	x : DOUBLE
-	y : DOUBLE
-
-feature {NONE} -- Initialization
-	make (x_val : DOUBLE; y_val : DOUBLE) is
-			-- Create POSITION object with given value
-		do
-			x := x_val
-			y := y_val
-		end
-
 invariant
-	point_not_far_from_main_hall : get_x * get_x + get_y * get_y < 1000.0
-
+	not_too_far: (x - Origin.x) ^ 2 + (y - Origin.y) ^ 2 <= Radius
 end

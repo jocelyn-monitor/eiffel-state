@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {SOLDIER}."
+	description: "Soldiers."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -8,25 +8,16 @@ class
 	SOLDIER
 
 inherit
-	ARMYBEING
+	ARMY_BEING
 
 create
 	make
 
 feature -- Access
-	get_type : STRING is
-		do
-			Result := "Soldier"
-		end
+	type: STRING is "Soldier"
 
+	power: INTEGER is 5
 
-feature {NONE} -- Initialization
-	make (place : POSITION) is
-			-- Creating new soldier
-		do
-			maximum_hp := 100
-			hit_points := maximum_hp
-			power := 5
-			position := place
-		end
+	max_hit_points: INTEGER is 100
+
 end

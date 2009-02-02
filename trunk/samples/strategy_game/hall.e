@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {HALL}."
+	description: "City halls that train workers and heroes."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -9,28 +9,45 @@ class
 
 inherit
 	BUILDING
-
+		rename
+			make as make_with_position
+		end
 create
 	make
 
+feature -- Initialization
+	make is
+			-- Create hall at origin
+		do
+			make_with_position (create {POSITION}.make_origin)
+		end
+
 feature -- Access
-	get_type : STRING is
+	type: STRING is "Hall"
+
+	last_worker: WORKER
+			-- Last trained worker
+
+	last_hero: HERO
+			-- Last trained hero
+
+feature -- Basic operations
+	train_worker is
+			-- Train worker and store him in `last_worker'
 		do
-			Result := "Hall"
+			create last_worker.make (position)
+			io.put_string (last_worker.out + " has just been trained%N")
+		ensure
+			last_worker_exists: last_worker /= Void
 		end
 
-	train_worker : WORKER is
-			-- Train worker from this hall
+	train_hero is
+			-- Train hero and store him in `last_hero'
 		do
-			create Result.make (get_position)
-			io.put_string (Result.to_string + " has just been trained%N")
-		end
-
-	train_hero : HERO is
-			-- Train hero
-		do
-			create Result.make (get_position)
-			io.put_string (Result.to_string + " has just been trained%N")
+			create last_hero.make (position)
+			io.put_string (last_hero.out + " has just been trained%N")
+		ensure
+			last_hero_exists: last_hero /= Void
 		end
 
 end

@@ -1,15 +1,10 @@
 note
-	description: "Summary description for {RESOURCE}."
+	description: "Resources that can be collected and traded."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
 
 deferred class
 	RESOURCE
-
-feature {NONE} -- Initialization
-	make is
-		do
-		end
-
+	
 end
