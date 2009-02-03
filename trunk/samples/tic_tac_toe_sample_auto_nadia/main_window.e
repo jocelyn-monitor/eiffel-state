@@ -28,19 +28,20 @@ feature {NONE} -- Initialization
 		do
 			Precursor {EV_TITLED_WINDOW}
 
-			state := First_turn_cross
-			start_new_game
+			create {WINNER_FIRST_MANAGER} game_manager
 
 			build_main_container
 			extend (main_container)
 			close_request_actions.extend (agent close_window)
 			set_title (Window_title)
 			set_size (Window_width, Window_height)
+
+			game_manager.start_new_game
 		end
 
 feature {NONE} -- Model
-	game: GAME
-			-- Game
+	game_manager: GAME_MANAGER
+			-- Game manager
 
 	update_buttons is
 			-- Update `buttons' according to `game'
@@ -57,7 +58,7 @@ feature {NONE} -- Model
 				until
 					j > {GAME}.Dimension
 				loop
-					buttons.item (i, j).set_text (game.item (i, j).out)
+					buttons.item (i, j).set_text (game_manager.current_game.item (i, j).out)
 					j := j + 1
 				end
 				i := i + 1
@@ -72,23 +73,10 @@ feature {NONE} -- Model
 			j_not_too_small: j >= 1
 			j_not_too_large: j <= {GAME}.Dimension
 		do
-			game.make_turn (i, j)
+			game_manager.current_game.make_turn (i, j)
 			update_buttons
-			if game.is_over then
+			if game_manager.current_game.is_over then
 				request_new_game
-			end
-		end
-
-feature {NONE} -- State dependent: model
-	start_new_game is
-			-- Start a new game
-		do
-			if state = First_turn_cross then
-				create game.make_first_cross
-				state := First_turn_circle
-			else
-				create game.make_first_circle
-				state := First_turn_cross
 			end
 		end
 
@@ -141,7 +129,7 @@ feature {NONE} -- View
 			question_dialog.show_modal_to_window (Current)
 
 			if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
-				start_new_game
+				game_manager.start_new_game
 				update_buttons
 			else
 				close_window
@@ -172,14 +160,8 @@ feature {NONE} -- Constants
 	Window_height: INTEGER is 400
 			-- Initial height for this window.
 
-feature {NONE} -- States
-	First_turn_cross: INTEGER is 1
-	First_turn_circle: INTEGER is 2
-
-	state: INTEGER
-
 invariant
-	game_exists: game /= Void
+	game_manager_exists: game_manager /= Void
 	main_container_exists: main_container /= Void
 	buttons_exists: buttons /= Void
 	each_button_exists: not buttons.has (Void)

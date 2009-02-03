@@ -76,6 +76,18 @@ feature -- State-dependent: status report
 			Result := (state = Cross_win) or (state = Circle_win) or (state = Draw)
 		end
 
+	did_cross_win: BOOLEAN is
+			-- Did the crosses win?
+		do
+			Result := (state = Cross_win)
+		end
+
+	did_circle_win: BOOLEAN is
+			-- Did the crosses win?
+		do
+			Result := (state = Circle_win)
+		end
+
 feature -- State dependent: basic operations
 	make_turn (i, j: INTEGER) is
 			-- Make turn, filling cell (`i', `j')
