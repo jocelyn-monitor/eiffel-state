@@ -76,13 +76,13 @@ feature -- State-dependent: status report
 			Result := (state = Cross_win) or (state = Circle_win) or (state = Draw)
 		end
 
-	did_cross_win: BOOLEAN is
+	cross_won: BOOLEAN is
 			-- Did the crosses win?
 		do
 			Result := (state = Cross_win)
 		end
 
-	did_circle_win: BOOLEAN is
+	circle_won: BOOLEAN is
 			-- Did the crosses win?
 		do
 			Result := (state = Circle_win)

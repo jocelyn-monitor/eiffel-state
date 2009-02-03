@@ -25,10 +25,10 @@ feature -- State dependent: basic operations
 			-- Start a new game
 		do
 			if state = First_turn_cross then
-				if current_game /= Void and then current_game.did_cross_win then
+				if current_game /= Void and then current_game.cross_won then
 					create current_game.make_first_cross
 					state := First_turn_circle
-				elseif current_game /= Void and then current_game.did_circle_win then
+				elseif current_game /= Void and then current_game.circle_won then
 					create current_game.make_first_circle
 					state := First_turn_cross
 				else
@@ -36,10 +36,10 @@ feature -- State dependent: basic operations
 					state := First_turn_circle
 				end
 			else
-				if current_game /= Void and then current_game.did_cross_win then
+				if current_game /= Void and then current_game.cross_won then
 					create current_game.make_first_cross
 					state := First_turn_circle
-				elseif current_game /= Void and then current_game.did_circle_win then
+				elseif current_game /= Void and then current_game.circle_won then
 					create current_game.make_first_circle
 					state := First_turn_cross
 				else
