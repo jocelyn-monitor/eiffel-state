@@ -77,4 +77,57 @@ This approach is not completely straightforward at handling arguments (but I thi
 
 _Advantages_: fancy agent stuff (?)
 
-_Disadvantages_: repeated event dispatch, problems with type-safety, some runtime overhead, is it really readable? 
+_Disadvantages_: repeated event dispatch, problems with type-safety, some runtime overhead, is it really readable?
+
+  * State-dependent routines as objects
+We can introduce a class representing state-dependent routine, which will have feature "call (args: TUPLE; state: STATE)", making a transition, executing its action and storing new state in an attribute. Inside it will contain a table, indexed by states. For each state there will be a list of transitions, each represented by guard condition (agent), action (agent) and target state.
+
+Class state in this approach doesn't play a particular role, it can be something with name inside; or it can be even an integer. In case we use a hash table of transitions, it should be hashable.
+
+Particular state-dependent routines can be again represented with once functions, as in:
+{{{
+sdr_put_cross: STATE_DEPENDENT_ROUTINE is
+	once
+		create Result
+		Result.add_transition (Empty, agent trivially_true, agent do_nothing, Cross)
+	end
+}}}
+
+The implementations of state-dependent routines themselves in this case look like:
+{{{
+put_cross is
+		-- Put cross into the cell
+	do
+		call (sdr_put_cross, [])
+	end
+}}}
+where "call" is defined in class AUTOMATED, from which all automated classes inherit:
+{{{
+deferred class
+	AUTOMATED
+
+feature {NONE} -- Implementation
+	call (sdr: STATE_DEPENDENT_ROUTINE; args: TUPLE) is
+			--
+		do
+			sdr.call (args, state)
+			state := sdr.next_state
+		end
+
+feature {NONE} -- States
+	state: STATE
+
+feature {NONE} -- Predicates
+	trivially_true: BOOLEAN is
+			--
+		do
+			Result := True
+		end
+end
+}}}
+
+With this approach it is easier to pass arguments to the predicate and action and easier to achieve type safety. In particular, we can also define STATE_DEPENDENT_FUNCTION and parametrize it with result type.
+
+_Advantages_: no repeated event dispatch, (relative) type safety, easy argument passing, nice abstractions (IMHO)
+
+_Disadvantages_: some runtime overhead, ?
