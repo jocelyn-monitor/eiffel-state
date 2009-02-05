@@ -18,9 +18,9 @@ feature -- Basic operations
 			current_game_exists: current_game /= Void
 		end
 
-feature {NONE} -- States
-	First_turn_cross: INTEGER is 1
-	First_turn_circle: INTEGER is 2
+feature {NONE} -- Implementation
+	first_turn: INTEGER
 
-	state: INTEGER
+invariant
+	first_turn_one_of_two: first_turn = {GAME}.Cross_code or first_turn = {GAME}.Circle_code
 end
