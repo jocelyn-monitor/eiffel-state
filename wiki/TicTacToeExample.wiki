@@ -48,3 +48,33 @@ _Advantages_: very object-oriented (classes for states, dynamic binding used for
 _Disadvantages_: big code size overhead (difficult to write by hand), no library needed
 
 *Dynamic*
+  * States as tables, agent-based
+Class state contains a table, indexed by events (routines of the automated class), represented as agents. For each event there is a list of transitions, each containing a guarding condition (again an agent), an action (one more agent) and a target state.
+If the automaton is not supposed to change during execution (which is almost always the case), actual states can be represented inside the automated class as once functions:
+{{{
+empty: STATE is
+		-- State Empty
+	once
+		create Result
+		Result.add_transition (agent put_cross, agent trivially_true, agent do_nothing, cross)
+		Result.add_transition (agent put_circle, agent trivially_true, agent do_nothing, circle)
+	end
+}}}
+
+State-dependent procedures are all implemented in a similar way:
+{{{
+put_cross is
+		-- Put cross into the cell
+	do
+		state.make_transition (agent put_cross)
+		state := state.next_state
+	end
+}}}
+
+Note that inline agents can be used for predicates and actions, thus there is no need to introduce a feature for each of them, which is nice.
+
+This approach is not completely straightforward at handling arguments (but I think it should be possible) and type-safety. Special care is needed for state-dependent queries to handle their results in a type-safe way.
+
+_Advantages_: fancy agent stuff (?)
+
+_Disadvantages_: repeated event dispatch, problems with type-safety, some runtime overhead, is it really readable? 
