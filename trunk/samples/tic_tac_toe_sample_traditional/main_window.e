@@ -30,28 +30,20 @@ feature {NONE} -- Initialization
 		do
 			Precursor {EV_TITLED_WINDOW}
 
-			first_turn := {GAME}.Cross_code
-			create game.make (first_turn)
+			create {WINNER_FIRST_MANAGER} game_manager
+
 			build_main_container
 			extend (main_container)
-
-				-- Execute `request_close_window' when the user clicks
-				-- on the cross in the title bar.
 			close_request_actions.extend (agent close_window)
-
-				-- Set the title of the window
 			set_title (Window_title)
-
-				-- Set the initial size of the window
 			set_size (Window_width, Window_height)
+
+			game_manager.start_new_game
 		end
 
 feature {NONE} -- Model
-	game: GAME
-			-- Game
-
-	first_turn: INTEGER
-			-- First turn in current game
+    game_manager: GAME_MANAGER
+            -- Game manager
 
 	string_representation: ARRAY [STRING] is
 			-- String representation of cell values
@@ -77,7 +69,7 @@ feature {NONE} -- Model
 				until
 					j > {GAME}.Dimension
 				loop
-					buttons.item (i, j).set_text (string_representation.item (game.item (i, j)))
+					buttons.item (i, j).set_text (string_representation.item (game_manager.current_game.item (i, j)))
 					j := j + 1
 				end
 				i := i + 1
@@ -92,9 +84,9 @@ feature {NONE} -- Model
 			j_not_too_small: j >= 1
 			j_not_too_large: j <= {GAME}.Dimension
 		do
-			game.make_turn (i, j)
+			game_manager.current_game.make_turn (i, j)
 			update_buttons
-			if game.is_over then
+			if game_manager.current_game.is_over then
 				request_new_game
 			end
 		end
@@ -148,12 +140,7 @@ feature {NONE} -- View
 			question_dialog.show_modal_to_window (Current)
 
 			if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
-				if first_turn = {GAME}.Cross_code then
-					first_turn := {GAME}.circle_code
-				else
-					first_turn := {GAME}.Cross_code
-				end
-				create game.make (first_turn)
+				game_manager.start_new_game
 				update_buttons
 			else
 				close_window
@@ -185,8 +172,7 @@ feature {NONE} -- Constants
 			-- Initial height for this window.
 
 invariant
-	game_exists: game /= Void
-	first_turn_one_of_two: first_turn = {GAME}.Cross_code or first_turn = {GAME}.Circle_code
+	game_manager_exists: game_manager /= Void
 	main_container_exists: main_container /= Void
 	buttons_exists: buttons /= Void
 	each_button_exists: not buttons.has (Void)
