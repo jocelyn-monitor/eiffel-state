@@ -31,3 +31,20 @@ In automata-based version we made the above listed classes automated and added o
   # Clients often need to know the control state of the automated object (examples: functions is_empty, is_cross, is_circle in FIELD_CELL; is_over, cross_won, circle_won in GAME). I decided for hiding the state from clients anyway and introducing functions for these purposes, but it may seem like a big overhead (especially in the case of FIELD_CELL above). The question is whether we want to make control state public instead? My answer will be no, because in the end control states won't be just regular attributes, there will be a special notation for them; so they cannot be used as regular attributes, but instead we should include the possibility of control state exchange into diagrams if we want to make them public. Another possibility is to automate somehow in our future tool the generation of such functions.
   # Overall about state-dependent functions. As we see from the example, state dependent functions proved useful. However, I think, we should impose the restriction, that such functions cannot be used in transition conditions. One more thing: though these functions are state-dependent, they never change the control state (being side-effect free, like all Eiffel functions). So, in my opinion, they should not be depicted in state-transition diagram, as they just pollute diagrams with many redundant loops. We should find another notation for them.
   # Precise STD notation should be discussed. Writing full pieces of code on transitions might be inconvenient, so we probably need abbreviations in Shalyto style or something like that. Note that we don't want to make the programmer introduce a separate feature for each action or predicate. E.g. in start_new_game of WINNER_FIRST_MANAGER the actions look like "create current_game.make_first_cross" and the predicates like "current_game /= Void and then current_game.cross_won". We would probably want to allow arbitrary boolean expression as a predicate and arbitrary compound as an action. Then we would need some "abbreviation table", where the programmer can introduce abbreviations and code pieces that correspond to them. I think it's psychologically easier for a programmer to introduce a new abbreviation, than to introduce a new feature for each predicate and action.
+
+=== Implementation approaches ===
+*Static*
+  * Switch-like
+Here the output function and the transition function of an automaton are described through conditional or multi-choice instructions of the language. As we already have the property that features of an automated class correspond to "events" in the automaton, event-dispatch is done through calling different features and only the state-dispatch is done explicitly.
+
+_Advantages_: simple for coding by hand, no overhead in code size and efficiency, flexible description of transitions (number, order, structure, etc.) 
+
+_Disadvantages_: states are integers (?), flexible description of transitions (if writing by hand may cause errors), some people find it ugly (?), no library needed
+  * State pattern-like (between static and dynamic)
+For every automated class we have one more class for each of its states + one class for abstract state with the same interface. Output and transition functions are encoded in the features of state classes.
+
+_Advantages_: very object-oriented (classes for states, dynamic binding used for dispatch)
+
+_Disadvantages_: big code size overhead (difficult to write by hand), no library needed
+
+*Dynamic*
