@@ -84,7 +84,7 @@ We can introduce a class representing state-dependent routine, which will have f
 
 Class state in this approach doesn't play a particular role, it can be something with name inside; or it can be even an integer. In case we use a hash table of transitions, it should be hashable.
 
-Particular state-dependent routines can be again represented with once functions, as in:
+Particular state-dependent routines can be again represented with once routines, as in:
 {{{
 sdr_put_cross: STATE_DEPENDENT_ROUTINE is
 	once
@@ -92,6 +92,7 @@ sdr_put_cross: STATE_DEPENDENT_ROUTINE is
 		Result.add_transition (Empty, agent trivially_true, agent do_nothing, Cross)
 	end
 }}}
+Note: this works only for computational state-independent guarding predicates and actions (otherwise, Current in agents is bound to the first created object of a particular class and routines are not invoked properly for all objects, except the first one that was created). For computational state-dependent guarding predicates and actions, use either agents with Current as argument, or store state-dependent routines in attributes and initialize them upon creation.
 
 The implementations of state-dependent routines themselves in this case look like:
 {{{
