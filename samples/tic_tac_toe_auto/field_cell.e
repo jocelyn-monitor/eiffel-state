@@ -22,10 +22,11 @@ feature {NONE} -- Initialization
 			cross_state: STATE
 			circle_state: STATE
 		do
-			states := create {HASH_TABLE[STATE, INTEGER]}.make (10)
+			states := create {HASH_TABLE [STATE, INTEGER]}.make (10)
 			create cross_state.make (1, "Cross")
 			create circle_state.make (-1, "Circle")
 			create empty_state.make (0, "Empty")
+			empty_state.add_transitions (agent empty_transitions(?, ?));
 			states.put (empty_state, empty_state.get_state_id)
 			states.put (cross_state, cross_state.get_state_id)
 			states.put (circle_state, circle_state.get_state_id)
@@ -40,10 +41,17 @@ feature -- Command
 			-- makes turn for player
 		require
 			{GAME}.circle_code = player or {GAME}.cross_code = player
+		local
+			new_state: INTEGER
+			args: HASH_TABLE [INTEGER, STRING]
+			transitions: FUNCTION [ANY, TUPLE, INTEGER]
 		do
-			if state.get_state_id = 0 then
-				state := states.item (player)
-			end
+			create args.make (2)
+			args.put (player, "turn")
+			transitions := state.get_transitions ()
+
+			new_state := transitions.item ([args, state.get_state_id])
+			state := states.item (new_state)
 		end
 
 feature -- Access
@@ -51,6 +59,23 @@ feature -- Access
 		do
 			Result := state.get_state_id
 		end
+
+feature -- Transitions
+
+	empty_transitions (args: TABLE[INTEGER, STRING]; state_id: INTEGER) : INTEGER is
+			-- transition from empty to cross
+		do
+			if not args.valid_key ("turn") then
+				Result := state_id
+			else
+				if  args.item ("turn") = {GAME}.circle_code then
+					Result := {GAME}.circle_code
+				else
+					Result := {GAME}.cross_code
+				end
+			end
+		end
+
 
 
 feature {NONE} -- States description
