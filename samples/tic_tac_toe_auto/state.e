@@ -12,25 +12,17 @@ create
 
 feature {NONE} -- Initialization
 
-	make (init_state_id: INTEGER; init_state_name: STRING) is
+	make (init_state_id: INTEGER; init_state_name: STRING; init_transitions: FUNCTION [ANY, TUPLE, INTEGER]) is
 			-- Initialization for `Current'.
 		do
 			state_id := init_state_id
 			state_name := init_state_name
+			transitions := init_transitions
 		end
 
 	state_id: INTEGER -- id of the state
 	state_name: STRING -- name of the state
 	transitions: FUNCTION [ANY, TUPLE, INTEGER] -- transitions from state
-
-feature -- Commands
-
-	add_transitions (new_transition: FUNCTION [ANY, TUPLE, INTEGER]) is
-			-- Adds transition to state
-		do
-			transitions := new_transition
-		end
-
 
 feature -- Queries
 
@@ -46,10 +38,17 @@ feature -- Queries
 			Result := state_name
 		end
 
-	get_transitions: FUNCTION [ANY, TUPLE, INTEGER] is
-			-- returns list of transitions
+	get_new_state_id (args: HASH_TABLE [INTEGER, STRING]): INTEGER is
+			-- returns new state id
+		local
+			new_state: INTEGER
 		do
-			Result := transitions
+			if transitions = Void then
+				Result := state_id
+			else
+				new_state := transitions.item ([args, state_id])
+				Result := new_state
+			end
 		end
 
 
