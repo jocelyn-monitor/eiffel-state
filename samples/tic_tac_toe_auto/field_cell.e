@@ -54,7 +54,7 @@ feature -- Access
 			Result := state.get_state_id
 		end
 
-feature -- Transitions
+feature {NONE} -- Transitions
 
 	empty_transitions (args: TABLE[INTEGER, STRING]; state_id: INTEGER) : INTEGER is
 			-- transition from empty to cross
