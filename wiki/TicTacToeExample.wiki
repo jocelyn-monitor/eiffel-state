@@ -1,5 +1,4 @@
 #summary Description and design of Tic-Tac-Toe game
-#labels Unfinished
 
 = Introduction =
 
