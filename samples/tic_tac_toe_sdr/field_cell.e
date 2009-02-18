@@ -27,13 +27,15 @@ feature -- State dependent: Element change
 	put_cross is
 			-- Put cross into the cell
 		do
-			call (sd_put_cross, [])
+			sd_put_cross.call([], state)
+			state := sd_put_cross.next_state
 		end
 
 	put_circle is
 			-- Put circle into the cell
 		do
-			call (sd_put_circle, [])
+			sd_put_circle.call([], state)
+			state := sd_put_circle.next_state
 		end
 
 feature -- State dependent: Indicators
@@ -69,7 +71,7 @@ feature {NONE} -- Automaton
 
 	Circle: STATE is once create Result.make ("Circle") end
 
-	sd_put_cross: STATE_DEPENDENT_PROCEDURE is
+	sd_put_cross: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- State dependent procedure for `put_cross'
 		once
 			create Result.make (1)
@@ -79,7 +81,7 @@ feature {NONE} -- Automaton
 				Cross)
 		end
 
-	sd_put_circle: STATE_DEPENDENT_PROCEDURE is
+	sd_put_circle: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- State dependent procedure for `put_circle'
 		once
 			create Result.make (1)
@@ -89,7 +91,7 @@ feature {NONE} -- Automaton
 				Circle)
 		end
 
-	sd_out: STATE_DEPENDENT_FUNCTION [STRING] is
+	sd_out: STATE_DEPENDENT_FUNCTION [TUPLE, STRING] is
 			-- State dependent function for `out'
 		once
 			create Result.make (3)

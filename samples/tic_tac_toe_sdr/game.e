@@ -102,7 +102,8 @@ feature -- State dependent: basic operations
 			j_not_too_small: j >= 1
 			j_not_too_large: j <= Dimension
 		do
-			call (sd_make_turn, [i, j])
+			sd_make_turn.call ([i, j], state)
+			state := sd_make_turn.next_state
 		end
 
 feature {NONE} -- Predicates
@@ -257,7 +258,7 @@ feature {NONE} -- Automaton
 	Circle_win: STATE is once create Result.make ("Circle win") end
 	Draw: STATE is once create Result.make ("Draw") end
 
-	sd_make_turn: STATE_DEPENDENT_PROCEDURE
+	sd_make_turn: STATE_DEPENDENT_PROCEDURE [TUPLE[INTEGER, INTEGER]]
 			-- State-dependent procedure for `make_turn'
 
 	build_sd_make_turn is
@@ -290,10 +291,6 @@ feature {NONE} -- Automaton
 					do
 						item (i, j).put_cross
 					end,
---				agent (i, j, k: INTEGER)
---					do
---						item (i, j).put_cross
---					end,
 				Circle_turn)
 			sd_make_turn.add_behavior (Circle_turn,
 				agent (i, j: INTEGER): BOOLEAN
