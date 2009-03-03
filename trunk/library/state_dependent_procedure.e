@@ -5,7 +5,7 @@ indexing
 	revision: "$Revision$"
 
 class
-	STATE_DEPENDENT_PROCEDURE
+	STATE_DEPENDENT_PROCEDURE [ARGS -> TUPLE]
 
 create
 	make
@@ -23,10 +23,10 @@ feature -- Access
 			-- State to transit to after calling procedure
 
 feature -- Basic operations
-	add_behavior (state: STATE; guard: PREDICATE [ANY, TUPLE]; action: PROCEDURE [ANY, TUPLE]; target: STATE) is
+	add_behavior (state: STATE; guard: PREDICATE [ANY, ARGS]; action: PROCEDURE [ANY, ARGS]; target: STATE) is
 			-- Make procedure execute `action' and transit to `target' when called in `state' and `guard' holds
 		local
-			list: LINKED_LIST [TUPLE [guard: PREDICATE [ANY, TUPLE]; action: PROCEDURE [ANY, TUPLE]; target: STATE]]
+			list: LINKED_LIST [TUPLE [guard: PREDICATE [ANY, ARGS]; action: PROCEDURE [ANY, ARGS]; target: STATE]]
 		do
 			behaviors.search (state)
 			if behaviors.found then
@@ -38,7 +38,7 @@ feature -- Basic operations
 			end
 		end
 
-	call (args: TUPLE; state: STATE) is
+	call (args: ARGS; state: STATE) is
 			-- Call procedure in `state' with `args'
 		local
 			found: BOOLEAN
@@ -63,7 +63,7 @@ feature -- Basic operations
 		end
 
 feature -- Implementation
-	behaviors: HASH_TABLE [LINKED_LIST [TUPLE [guard: PREDICATE [ANY, TUPLE]; action: PROCEDURE [ANY, TUPLE]; target: STATE]], STATE]
+	behaviors: HASH_TABLE [LINKED_LIST [TUPLE [guard: PREDICATE [ANY, ARGS]; action: PROCEDURE [ANY, ARGS]; target: STATE]], STATE]
 
 invariant
 	behaviors_exists: behaviors /= Void
