@@ -5,7 +5,7 @@ indexing
 	revision: "$Revision$"
 
 class
-	STATE_DEPENDENT_FUNCTION [RES]
+	STATE_DEPENDENT_FUNCTION  [ARGS -> TUPLE, RES]
 
 create
 	make
@@ -19,10 +19,10 @@ feature {NONE} -- Initialization
 		end
 
 feature -- Basic operations
-	add_behavior (state: STATE; guard: PREDICATE [ANY, TUPLE]; function: FUNCTION [ANY, TUPLE, RES]) is
+	add_behavior (state: STATE; guard: PREDICATE [ANY, ARGS]; function: FUNCTION [ANY, ARGS, RES]) is
 			-- Make function return the result of `function' when called in `state' and `guard' holds
 		local
-			list: LINKED_LIST [TUPLE [guard: PREDICATE [ANY, TUPLE]; function: FUNCTION [ANY, TUPLE, RES]]]
+			list: LINKED_LIST [TUPLE [guard: PREDICATE [ANY, ARGS]; function: FUNCTION [ANY, ARGS, RES]]]
 		do
 			behaviors.search (state)
 			if behaviors.found then
@@ -34,19 +34,42 @@ feature -- Basic operations
 			end
 		end
 
-	add_result (state: STATE; guard: PREDICATE [ANY, TUPLE]; r: RES) is
+	add_result (state: STATE; guard: PREDICATE [ANY, ARGS]; res: RES) is
 			-- Make function return `r' when called in `state' and `guard' holds
+		local
+			list: LINKED_LIST [TUPLE [guard: PREDICATE [ANY, ARGS]; res: RES]]
 		do
-			add_behavior (state, guard, agent identity (r))
+			results.search (state)
+			if results.found then
+				results.found_item.extend ([guard, res])
+			else
+				create list.make
+				list.extend ([guard, res])
+				results.extend (list, state)
+			end
 		end
 
-	item (args: TUPLE; state: STATE): RES is
+	item (args: ARGS; state: STATE): RES is
 			-- Function result in `state' with `args' (default value if no specific behavior defined)
 		local
 			found: BOOLEAN
 		do
+			results.search (state)
+			if results.found then
+				from
+					results.found_item.start
+				until
+					results.found_item.after or found
+				loop
+					 if results.found_item.item.guard.item (args) then
+						 found := True
+						 Result := results.found_item.item.res
+					 end
+					results.found_item.forth
+				end
+			end
 			behaviors.search (state)
-			if behaviors.found then
+			if behaviors.found and not found then
 				from
 					behaviors.found_item.start
 				until
@@ -62,13 +85,9 @@ feature -- Basic operations
 		end
 
 feature -- Implementation
-	behaviors: HASH_TABLE [LINKED_LIST [TUPLE [guard: PREDICATE [ANY, TUPLE]; function: FUNCTION [ANY, TUPLE, RES]]], STATE]
+	behaviors: HASH_TABLE [LINKED_LIST [TUPLE [guard: PREDICATE [ANY, ARGS]; function: FUNCTION [ANY, ARGS, RES]]], STATE]
 
-	identity (x: RES): RES is
-			-- Identity function
-		do
-			Result := x
-		end
+	results: HASH_TABLE [LINKED_LIST [TUPLE [guard: PREDICATE [ANY, ARGS]; res: RES]], STATE]
 
 invariant
 	behaviors_exists: behaviors /= Void
