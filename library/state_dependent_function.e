@@ -16,6 +16,8 @@ feature {NONE} -- Initialization
 		do
 			create behaviors.make (n)
 			behaviors.compare_objects
+			create results.make (n)
+			results.compare_objects
 		end
 
 feature -- Basic operations
