@@ -9,17 +9,15 @@ class
 
 inherit
 	BUILDING
-		rename
-			make as make_with_position
-		end
+
 create
-	make
+	make, make_at_origin
 
 feature -- Initialization
-	make is
+	make_at_origin is
 			-- Create hall at origin
 		do
-			make_with_position (create {POSITION}.make_origin)
+			make (create {POSITION}.make_origin)
 		end
 
 feature -- Access
@@ -31,20 +29,24 @@ feature -- Access
 	last_hero: HERO
 			-- Last trained hero
 
+	max_hit_points: INTEGER is 500
+
 feature -- Basic operations
-	train_worker is
+	train_worker: INTEGER is
 			-- Train worker and store him in `last_worker'
 		do
 			create last_worker.make (position)
+			Result := Result + (last_worker.creation_time / sd_ability_decrease.item ([], hp_state)).ceiling
 			io.put_string (last_worker.out + " has just been trained%N")
 		ensure
 			last_worker_exists: last_worker /= Void
 		end
 
-	train_hero is
+	train_hero: INTEGER is
 			-- Train hero and store him in `last_hero'
 		do
 			create last_hero.make (position)
+			Result := Result + (last_hero.creation_time / sd_ability_decrease.item ([], hp_state)).ceiling
 			io.put_string (last_hero.out + " has just been trained%N")
 		ensure
 			last_hero_exists: last_hero /= Void

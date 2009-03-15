@@ -1,5 +1,5 @@
 note
-	description: "Sawmills that produce lamber."
+	description: "Sawmills that produce lamber from trees."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -23,10 +23,13 @@ feature -- Access
 
 	last_lumber: LUMBER
 
+	max_hit_points: INTEGER is 150
+
 feature -- Basic operation
-	produce is
+	produce: INTEGER is
 			-- Produce resource and store it into `last_resource'
 		do
 			create last_lumber
+			Result := last_lumber.creation_time
 		end
 end

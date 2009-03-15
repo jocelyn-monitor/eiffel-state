@@ -26,10 +26,11 @@ feature {NONE} -- Initialization
 
 			forest_position: POSITION
             i: INTEGER
+            time : INTEGER
         do
-            create hall.make
+            create hall.make_at_origin
 
-			hall.train_hero
+			time := time + hall.train_hero
             powerful_hero := hall.last_hero
 
             create workers.make (1, 3)
@@ -38,12 +39,12 @@ feature {NONE} -- Initialization
             until
                 i > 3
             loop
-            	hall.train_worker
+            	time := time + hall.train_worker
                 workers.put (hall.last_worker, i)
                 i := i + 1
             end
 
-			workers.item (1).build_barrack (create {POSITION}.make (1,0))
+			time := time + workers.item (1).build_barrack (create {POSITION}.make (1,0))
             barrack := workers.item (1).last_barrack
 
             create soldiers.make (1, 10)
@@ -52,15 +53,15 @@ feature {NONE} -- Initialization
             until
                 i > 10
             loop
-            	barrack.train_soldier
+            	time := time + barrack.train_soldier
                 soldiers.put (barrack.last_soldier, i)
                 i := i + 1
             end
 
-			workers.item (2).build_mine (create {POSITION}.make (1, 1))
+			time := time + workers.item (2).build_mine (create {POSITION}.make (1, 1))
             mine := workers.item (2).last_mine
 
-			workers.item (3).build_sawmill (create {POSITION}.make (0, 1))
+			time := time + workers.item (3).build_sawmill (create {POSITION}.make (0, 1))
             sawmill := workers.item (3).last_sawmill
 
             create forest_position.make (-2, 0)
@@ -71,7 +72,7 @@ feature {NONE} -- Initialization
             until
                 i > 3
             loop
-            	workers.item (i).collect_lumber (forest_position, sawmill)
+            	time := time + workers.item (i).collect_lumber (forest_position, sawmill)
                 resources.extend (sawmill.last_lumber)
                 i := i + 1
             end
@@ -81,7 +82,7 @@ feature {NONE} -- Initialization
             until
                 i > 3
             loop
-            	workers.item (i).collect_gold (mine)
+            	time := time + workers.item (i).collect_gold (mine)
                 resources.extend (mine.last_gold)
                 i := i + 1
             end

@@ -8,7 +8,7 @@ class
 	POSITION
 
 inherit
-	ANY
+	AUTOMATED
 		redefine
 			out
 		end
@@ -18,13 +18,14 @@ create
 	make_origin
 
 feature -- Initialization
-	make (new_x, new_y: DOUBLE) is
+	make (new_x, new_y: INTEGER) is
 			-- Set `x' to `new_x' and `y' to `new_y'
 		require
-			not_too_far: (new_x - Origin.x) ^ 2 + (new_y - Origin.y) ^ 2 <= Radius
+			not_too_far: (new_x - Origin.x) ^ 2 + (new_y - Origin.y) ^ 2 <= Radius * Radius
 		do
 			x := new_x
 			y := new_y
+			state := Forest
 		ensure
 			x_set: x = new_x
 			y_set: y = new_y
@@ -33,15 +34,18 @@ feature -- Initialization
 	make_origin is
 			-- Create an origin point
 		do
+			x := 0
+			y := 0
+			state := Forest
 		ensure
-			x_set: x = 0.0
-			y_set: y = 0.0
+			x_set: x = 0
+			y_set: y = 0
 		end
 
 feature -- Access
-	x : DOUBLE
+	x: INTEGER
 
-	y : DOUBLE
+	y: INTEGER
 
 	Origin: POSITION is
 			-- Origin of the world
@@ -49,17 +53,48 @@ feature -- Access
 			create Result.make_origin
 		end
 
-	Radius: DOUBLE is 1000.0
+	Radius: INTEGER is 1000
 			-- World radius
 
+feature -- Status report
+	equals (other: POSITION) : BOOLEAN is
+			-- Are these two positions equal?
+		do
+			Result := x = other.x and y = other.y
+		end
+
+feature -- State dependent: Status report
+	crossing_time: INTEGER is
+			-- It takes `crossing_time' to cross cell with this coordinates according to its relief
+			do
+				Result := sd_crossing_time.item ([], state)
+			end
 
 feature -- Output
 	out: STRING is
-			-- String representation in form (`x', `y')
+			-- String representation in form (`x', `y', `Relief')
 		do
-			Result := "(" + x.out + ", " + y.out + ")"
+			Result := "(" + x.out + ", " + y.out + ", " + state.name + ")"
+		end
+
+feature {NONE}
+	Forest: STATE is once create Result.make ("Forest") end
+	Field: STATE is once create Result.make ("Field") end
+	River: STATE is once create Result.make ("River") end
+	Jungle: STATE is once create Result.make ("Jungle") end
+	Mountain: STATE is once create Result.make ("Mountain") end
+
+	sd_crossing_time: STATE_DEPENDENT_FUNCTION [INTEGER] is
+			-- State-dependent function for `crossing_time'
+		once
+			create Result.make(5)
+			Result.add_result (Forest, agent otherwise, 100)
+			Result.add_result (Jungle, agent otherwise, 150)
+			Result.add_result (Field, agent otherwise, 50)
+			Result.add_result (River, agent otherwise, 200)
+			Result.add_result (Mountain, agent otherwise, 300)
 		end
 
 invariant
-	not_too_far: (x - Origin.x) ^ 2 + (y - Origin.y) ^ 2 <= Radius
+	not_too_far: (x - Origin.x) ^ 2 + (y - Origin.y) ^ 2 <= Radius * Radius
 end

@@ -1,5 +1,5 @@
 note
-	description: "Heroes that can heal other beings."
+	description: "Heroes that can heal other beings and are more powerful in a battle."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -16,9 +16,14 @@ create
 feature -- Access
 	type: STRING is "Hero"
 
-	power: INTEGER is 10
+	maximum_power: INTEGER is 10
 
 	max_hit_points: INTEGER is 200
+
+	creation_time: INTEGER is 30
+			-- Hero training time
+
+	maximum_movement_speed: INTEGER is 2
 
 feature -- Besic operation
 	heal_being (b: BEING) is

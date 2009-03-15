@@ -14,6 +14,10 @@ inherit
 		end
 
 feature -- Access
-	max_hit_points: INTEGER is 100
+	creation_time: INTEGER is
+			-- Time required for constructing some Building
+		do
+			Result := (max_hit_points / {WORKER}.creation_time).rounded
+		end
 
 end
