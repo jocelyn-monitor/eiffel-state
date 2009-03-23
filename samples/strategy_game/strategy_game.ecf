@@ -7,11 +7,15 @@
 		</option>
 		<precompile name="base_pre" location="$ISE_PRECOMP\base.ecf"/>
 		<library name="base" location="$ISE_LIBRARY\library\base\base.ecf"/>
+		<library name="estate" location="D:\downloads\Eiffel\library\eiffelstate.ecf"/>
 		<cluster name="strategy_game" location=".\" recursive="true">
 			<file_rule>
 				<exclude>/EIFGENs$</exclude>
 				<exclude>/.svn$</exclude>
 				<exclude>/CVS$</exclude>
+			</file_rule>
+			<file_rule>
+				<exclude>^/local_library_copy$</exclude>
 			</file_rule>
 		</cluster>
 	</target>

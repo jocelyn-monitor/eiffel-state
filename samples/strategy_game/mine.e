@@ -74,13 +74,13 @@ feature {NONE}
 	Heavily_used: STATE is once create Result.make ("Heavily used") end
 	Depleted: STATE is once create Result.make ("Depleted") end
 
-	sd_collecting_time: STATE_DEPENDENT_FUNCTION [INTEGER] is
+	sd_collecting_time: STATE_DEPENDENT_FUNCTION [TUPLE, INTEGER] is
 			-- State-dependent function for `collecting_time'
 		once
 			create Result.make(3)
-			Result.add_result (Weakly_used, agent otherwise, 1)
-			Result.add_result (Heavily_used, agent otherwise, 2)
-			Result.add_result (Depleted, agent otherwise, 1000)
+			Result.add_result (Weakly_used, agent : BOOLEAN do Result := True end, 1)
+			Result.add_result (Heavily_used, agent : BOOLEAN do Result := True end, 2)
+			Result.add_result (Depleted, agent : BOOLEAN do Result := True end, 1000)
 		end
 
 	exhausted_state: STATE

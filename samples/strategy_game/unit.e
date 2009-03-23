@@ -116,14 +116,14 @@ feature {NONE}
 	Seriously_injured: STATE is once create Result.make ("Seriously injured") end
 	Dead: STATE is once create Result.make ("Dead") end
 
-	sd_ability_decrease: STATE_DEPENDENT_FUNCTION [DOUBLE] is
+	sd_ability_decrease: STATE_DEPENDENT_FUNCTION [TUPLE, DOUBLE] is
 			-- State-dependent function which changes abilities of beings: attack power, movement speed, repair rate etc
 		once
 			create Result.make(4)
-			Result.add_result (Alive, agent otherwise, 1.0)
-			Result.add_result (Injured, agent otherwise, 0.7)
-			Result.add_result (Seriously_injured, agent otherwise, 0.3)
-			Result.add_result (Dead, agent otherwise, 0.0)
+			Result.add_result (Alive, agent : BOOLEAN do Result := True end, 1.0)
+			Result.add_result (Injured, agent : BOOLEAN do Result := True end, 0.7)
+			Result.add_result (Seriously_injured, agent : BOOLEAN do Result := True end, 0.3)
+			Result.add_result (Dead, agent : BOOLEAN do Result := True end, 0.0)
 		end
 
 invariant

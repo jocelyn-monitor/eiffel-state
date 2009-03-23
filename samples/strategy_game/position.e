@@ -84,15 +84,15 @@ feature {NONE}
 	Jungle: STATE is once create Result.make ("Jungle") end
 	Mountain: STATE is once create Result.make ("Mountain") end
 
-	sd_crossing_time: STATE_DEPENDENT_FUNCTION [INTEGER] is
+	sd_crossing_time: STATE_DEPENDENT_FUNCTION [TUPLE, INTEGER] is
 			-- State-dependent function for `crossing_time'
 		once
 			create Result.make(5)
-			Result.add_result (Forest, agent otherwise, 100)
-			Result.add_result (Jungle, agent otherwise, 150)
-			Result.add_result (Field, agent otherwise, 50)
-			Result.add_result (River, agent otherwise, 200)
-			Result.add_result (Mountain, agent otherwise, 300)
+			Result.add_result (Forest, agent : BOOLEAN do Result := True end, 100)
+			Result.add_result (Jungle, agent : BOOLEAN do Result := True end, 150)
+			Result.add_result (Field, agent : BOOLEAN do Result := True end, 50)
+			Result.add_result (River, agent : BOOLEAN do Result := True end, 200)
+			Result.add_result (Mountain, agent : BOOLEAN do Result := True end, 300)
 		end
 
 invariant
