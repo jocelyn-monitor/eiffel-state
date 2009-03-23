@@ -1,5 +1,5 @@
 indexing
-	description: "Summary description for {GAME}."
+	description: "Tic-Tac-Toe games."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -258,7 +258,7 @@ feature {NONE} -- Automaton
 	Circle_win: STATE is once create Result.make ("Circle win") end
 	Draw: STATE is once create Result.make ("Draw") end
 
-	sd_make_turn: STATE_DEPENDENT_PROCEDURE [TUPLE]
+	sd_make_turn: STATE_DEPENDENT_PROCEDURE [TUPLE [INTEGER, INTEGER]]
 			-- State-dependent procedure for `make_turn'
 
 	build_sd_make_turn is
@@ -286,7 +286,7 @@ feature {NONE} -- Automaton
 					end,
 				Draw)
 			sd_make_turn.add_behavior (Cross_turn,
-				agent : BOOLEAN do Result := True end,
+				agent (i, j: INTEGER): BOOLEAN do Result := True end,
 				agent (i, j: INTEGER)
 					do
 						item (i, j).put_cross
@@ -313,7 +313,7 @@ feature {NONE} -- Automaton
 					end,
 				Draw)
 			sd_make_turn.add_behavior (Circle_turn,
-				agent : BOOLEAN do Result := True end,
+				agent (i, j: INTEGER): BOOLEAN do Result := True end,
 				agent (i, j: INTEGER)
 					do
 						item (i, j).put_circle
@@ -322,7 +322,8 @@ feature {NONE} -- Automaton
 		end
 
 feature {NONE} -- Implementation
-	field : ARRAY2 [FIELD_CELL]
+	field: ARRAY2 [FIELD_CELL]
+			-- Game field
 
 invariant
 	field_exists: field /= Void

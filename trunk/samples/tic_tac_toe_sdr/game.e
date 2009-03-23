@@ -1,5 +1,5 @@
 indexing
-	description: "Summary description for {GAME}."
+	description: "Tic-Tac-Toe games."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

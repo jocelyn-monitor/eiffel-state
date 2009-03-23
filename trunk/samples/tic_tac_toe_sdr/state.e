@@ -1,5 +1,5 @@
 indexing
-	description: "Summary description for {STATE}."
+	description: "Control states of automated classes."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

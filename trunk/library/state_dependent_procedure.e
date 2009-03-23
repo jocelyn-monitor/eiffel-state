@@ -12,7 +12,9 @@ create
 
 feature {NONE} -- Initialization
 	make (n: INTEGER) is
-			-- Create a procedure valid for `n' states
+			-- Create a procedure valid for at least `n' states
+		require
+			n_positive: n > 0
 		do
 			create behaviors.make (n)
 			behaviors.compare_objects
@@ -64,6 +66,7 @@ feature -- Basic operations
 
 feature -- Implementation
 	behaviors: HASH_TABLE [LINKED_LIST [TUPLE [guard: PREDICATE [ANY, ARGS]; action: PROCEDURE [ANY, ARGS]; target: STATE]], STATE]
+		-- Procedure behaviors in different states, when different guards hold
 
 invariant
 	behaviors_exists: behaviors /= Void

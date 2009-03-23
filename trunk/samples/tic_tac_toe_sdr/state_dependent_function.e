@@ -37,7 +37,7 @@ feature -- Basic operations
 	add_result (state: STATE; guard: PREDICATE [ANY, TUPLE]; r: RES) is
 			-- Make function return `r' when called in `state' and `guard' holds
 		do
-			add_behavior (state, guard, agent identity (create {ARGS}, r))
+			add_behavior (state, guard, agent identity (?, r))
 		end
 
 	item (args: ARGS; state: STATE): RES is
@@ -64,7 +64,7 @@ feature -- Basic operations
 feature -- Implementation
 	behaviors: HASH_TABLE [LINKED_LIST [TUPLE [guard: PREDICATE [ANY, TUPLE]; function: FUNCTION [ANY, ARGS, RES]]], STATE]
 
-	identity (args: ARGS; x: RES): RES is
+	identity (args: ?ARGS; x: RES): RES is
 			-- Identity function
 		do
 			Result := x
