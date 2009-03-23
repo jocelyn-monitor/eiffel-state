@@ -1,5 +1,5 @@
 indexing
-	description: "Summary description for {STATE}."
+	description: "Named control states."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -15,16 +15,22 @@ create
 
 feature -- Initialization
 	make (s: STRING) is
-			--
+			-- Create a state with name `s'
+		require
+			s_exists: s /= Void
+			s_non_empty: not s.is_empty
 		do
 			name := s
+		ensure
+			name_set: name = s
 		end
 
 feature -- Access
 	name: STRING
+			-- Name
 
 	hash_code: INTEGER is
-			--
+			-- Hash code
 		do
 			Result := name.hash_code
 		end

@@ -1,5 +1,5 @@
 indexing
-	description: "Summary description for {FIELD_CELL}."
+	description: "Cells of the game field."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
