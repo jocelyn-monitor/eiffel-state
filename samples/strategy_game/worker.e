@@ -42,7 +42,7 @@ feature -- State dependent: Access
 	repair_rate: INTEGER is
 			-- Repair rate which depends on hp level of worker
 		do
-			Result := (maximum_repair_rate * sd_ability_decrease.item ([], hp_state)).rounded
+			Result := (maximum_repair_rate * sd_ability_decrease.item ([], health_state)).rounded
 		end
 
 feature -- Basic operations
@@ -58,7 +58,7 @@ feature -- Basic operations
 			until
 				b.is_repaired
 			loop
-				b.increase_hit_points (repair_rate)
+				b.heal_this
 				Result := Result + 1
 			end
 			io.put_string (out + " has repaired building%N")
@@ -185,7 +185,6 @@ feature -- State dependent: Access
 		end
 
 feature {NONE} -- Implementation
-	max_hit_points: INTEGER is 25
 
 	Free: STATE is once create Result.make ("Free") end
 	Busy: STATE is once create Result.make ("Busy") end

@@ -20,8 +20,6 @@ create
 feature -- Initialization
 	make (new_x, new_y: INTEGER) is
 			-- Set `x' to `new_x' and `y' to `new_y'
-		require
-			not_too_far: (new_x - Origin.x) ^ 2 + (new_y - Origin.y) ^ 2 <= Radius * Radius
 		do
 			x := new_x
 			y := new_y
@@ -52,9 +50,6 @@ feature -- Access
 		once
 			create Result.make_origin
 		end
-
-	Radius: INTEGER is 1000
-			-- World radius
 
 feature -- Status report
 	equals (other: POSITION) : BOOLEAN is
@@ -95,6 +90,4 @@ feature {NONE}
 			Result.add_result (Mountain, agent : BOOLEAN do Result := True end, 300)
 		end
 
-invariant
-	not_too_far: (x - Origin.x) ^ 2 + (y - Origin.y) ^ 2 <= Radius * Radius
 end
