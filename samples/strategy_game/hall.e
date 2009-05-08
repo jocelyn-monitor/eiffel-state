@@ -11,14 +11,7 @@ inherit
 	BUILDING
 
 create
-	make, make_at_origin
-
-feature -- Initialization
-	make_at_origin is
-			-- Create hall at origin
-		do
-			make (create {POSITION}.make_origin)
-		end
+	make
 
 feature -- Access
 	type: STRING is "Hall"
@@ -29,10 +22,10 @@ feature -- Access
 	last_hero: HERO
 			-- Last trained hero
 
-	creation_time: INTEGER is 500
+	creation_time: DOUBLE is 50.0
 
 feature -- Basic operations
-	train_worker: INTEGER is
+	train_worker: DOUBLE is
 			-- Train worker and store him in `last_worker'
 		do
 			create last_worker.make (position)
@@ -42,7 +35,7 @@ feature -- Basic operations
 			last_worker_exists: last_worker /= Void
 		end
 
-	train_hero: INTEGER is
+	train_hero: DOUBLE is
 			-- Train hero and store him in `last_hero'
 		do
 			create last_hero.make (position)

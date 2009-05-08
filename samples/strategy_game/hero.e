@@ -16,19 +16,19 @@ create
 feature -- Access
 	type: STRING is "Hero"
 
-	creation_time: INTEGER is 30
+	creation_time: DOUBLE is 10.0
 			-- Hero training time
 
-	maximum_movement_speed: INTEGER is 2
+	maximum_movement_speed: DOUBLE is 1.5
 
 	maximum_accuracy: DOUBLE is 0.8
 
 feature -- Besic operation
-	heal_being (b: BEING) is
+	heal_being (b: BEING): DOUBLE is
 			-- Heal some being
 		do
 			io.put_string (out + " is healing " + b.out + "%N")
-			b.heal_this
+			Result := b.heal_this
 		end
 
 end

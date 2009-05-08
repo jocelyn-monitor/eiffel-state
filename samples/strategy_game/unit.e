@@ -26,6 +26,10 @@ feature -- Initialization
 		end
 
 feature -- Access
+	creation_time: DOUBLE is
+		deferred
+		end
+
 	position: POSITION
 			-- Current position of the unit in the game world
 
@@ -49,11 +53,12 @@ feature -- Basic operations
 			health_state := sd_attacked.next_state
 		end
 
-	heal_this is
+	heal_this: DOUBLE is
 			-- Increase health when unit is healed
 		do
 			sd_healed.call([], health_state)
 			health_state := sd_healed.next_state
+			Result := creation_time / 4
 		end
 
 feature -- Output

@@ -9,7 +9,7 @@ deferred class
 
 feature -- Access
 
-creation_time: INTEGER is
+creation_time: DOUBLE is
 		-- Time required to produce resource
 	deferred
 	end

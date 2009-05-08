@@ -23,8 +23,7 @@ feature -- Initialization
 			-- creates mine at `p' position
 		do
 			Precursor {PRODUCTION} (p)
-			gold_amount := maximum_gold_amount
-			update_used_state
+			exhausted_state := Weak_depreciation
 		end
 
 feature -- Access
@@ -32,55 +31,56 @@ feature -- Access
 
 	last_gold: GOLD
 
-	creation_time: INTEGER is 200
+	creation_time: DOUBLE is 20.0
 
-	gold_amount: INTEGER
+	gold_mined: INTEGER
 
-	maximum_gold_amount: INTEGER is 1000
+	middle_depreciation_level: INTEGER is 1000
 
-feature -- Basic operations
-	update_used_state is
-			-- Updates state of mine
-		do
-			if (gold_amount > (maximum_gold_amount / 2).floor) then
-				exhausted_state := Weakly_used
-			elseif (gold_amount /= 0) then
-				exhausted_state := Heavily_used
-			else
-				exhausted_state := Depleted
-			end
-		end
+	heavy_depreciation_level: INTEGER is 3000
 
 feature -- State dependent: Access
-	collecting_time: INTEGER is
+	collecting_time: DOUBLE is
 			-- Time required for collecting one gold bar
 		do
 			Result := sd_collecting_time.item([], exhausted_state)
 		end
 
 feature -- Basic operation
-	produce: INTEGER is
-			-- Produce resource and store it into `last_gold'
+	produce: DOUBLE is
+			-- Produce bar of gold and store it into `last_gold'
 		do
 			create last_gold
-			if (exhausted_state /= Depleted) then
-				gold_amount := gold_amount - 1
-			end
 			Result := collecting_time + last_gold.creation_time
+			gold_mined := gold_mined + 1
+			sd_produce.call ([], exhausted_state)
 		end
 
 feature {NONE}
-	Weakly_used: STATE is once create Result.make ("Weakly used") end
-	Heavily_used: STATE is once create Result.make ("Heavily used") end
-	Depleted: STATE is once create Result.make ("Depleted") end
+	Weak_depreciation: STATE is once create Result.make ("Weak depreciation") end
+	Medium_depreciation: STATE is once create Result.make ("Medium depreciation") end
+	Heavy_depreciation: STATE is once create Result.make ("Heavy depreciation") end
 
-	sd_collecting_time: STATE_DEPENDENT_FUNCTION [TUPLE, INTEGER] is
+	is_heavily_used: BOOLEAN
+		do
+			Result := True
+		end
+
+	sd_collecting_time: STATE_DEPENDENT_FUNCTION [TUPLE, DOUBLE] is
 			-- State-dependent function for `collecting_time'
 		once
 			create Result.make(3)
-			Result.add_result (Weakly_used, agent : BOOLEAN do Result := True end, 1)
-			Result.add_result (Heavily_used, agent : BOOLEAN do Result := True end, 2)
-			Result.add_result (Depleted, agent : BOOLEAN do Result := True end, 1000)
+			Result.add_result (Weak_depreciation, agent: BOOLEAN do Result := True end, 1.0)
+			Result.add_result (Medium_depreciation, agent: BOOLEAN do Result := True end, 3.0)
+			Result.add_result (Heavy_depreciation, agent: BOOLEAN do Result := True end, 15.0)
+		end
+
+	sd_produce: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+			-- State-dependent procedure for `produce'
+		once
+			create Result.make(2)
+			Result.add_behavior (Weak_depreciation, agent: BOOLEAN do Result := True end, agent do end, Medium_depreciation)
+			Result.add_behavior (Medium_depreciation, agent: BOOLEAN do Result := True end, agent do end, Heavy_depreciation)
 		end
 
 	exhausted_state: STATE

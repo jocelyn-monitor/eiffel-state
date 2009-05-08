@@ -11,11 +11,7 @@ inherit
 	UNIT
 
 feature -- Access
-	creation_time: INTEGER is
-		deferred
-		end
-
-	maximum_movement_speed: INTEGER is
+	maximum_movement_speed: DOUBLE is
 		deferred
 		end
 
@@ -27,7 +23,7 @@ feature -- State dependent: Access
 		end
 
 feature -- Element change
-	move (new_position: POSITION): INTEGER is
+	move (new_position: POSITION): DOUBLE is
 			-- Time which is taken by changing `position' to `new_position'
 		do
 			from
@@ -35,12 +31,12 @@ feature -- Element change
 				position.equals (new_position)
 			loop
 				if (position.x /= new_position.x) then
-					Result := Result + (position.crossing_time / movement_speed).ceiling
 					position := create {POSITION}.make (position.x + ((new_position.x - position.x) / (new_position.x - position.x).abs).rounded, position.y)
-				else
-					Result := Result + (position.crossing_time / movement_speed).ceiling
+				end
+				if (position.y /= new_position.y) then
 					position := create {POSITION}.make (position.x, position.y + ((new_position.y - position.y) / (new_position.y - position.y).abs).rounded)
 				end
+				Result := Result + position.crossing_time / movement_speed
 			end
 			io.put_string (out + " has moved to " + new_position.out + "%N")
 		ensure

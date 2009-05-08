@@ -14,7 +14,7 @@ feature -- Access
 	last_resource: RESOURCE
 
 feature -- Basic operation
-	produce: INTEGER is
+	produce: DOUBLE is
 			-- Produce resource and store it into `last_resource', return time required
 		deferred
 		ensure

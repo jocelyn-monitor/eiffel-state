@@ -27,26 +27,16 @@ feature -- Access
 
 	last_barrack: BARRACK
 
-	creation_time: INTEGER is 10
+	creation_time: DOUBLE is 10.0
 			-- Worker training time
 
-	maximum_movement_speed: INTEGER is 1
-
-	maximum_repair_rate: INTEGER is 5
-			-- Worker can repair `repair_rate' hp during one time period
+	maximum_movement_speed: DOUBLE is 1.0
 
 	resource_in_knapsack: RESOURCE
 			-- Resource which was collected by worker and wasn't transported to its destination yet
 
-feature -- State dependent: Access
-	repair_rate: INTEGER is
-			-- Repair rate which depends on hp level of worker
-		do
-			Result := (maximum_repair_rate * sd_ability_decrease.item ([], health_state)).rounded
-		end
-
 feature -- Basic operations
-	repair (b: BUILDING) : INTEGER is
+	repair (b: BUILDING) : DOUBLE is
 			-- Repair some building returning time needed
 		require
 			b_exists: b /= Void
@@ -56,10 +46,9 @@ feature -- Basic operations
 			Result := Result + move (b.position)
 			from
 			until
-				b.is_repaired
+				not b.is_repaired
 			loop
-				b.heal_this
-				Result := Result + 1
+				Result := Result + b.repair_this
 			end
 			io.put_string (out + " has repaired building%N")
 			accessibility_state := Free
@@ -68,7 +57,7 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
-	build_mine (p: POSITION): INTEGER is
+	build_mine (p: POSITION): DOUBLE is
 			-- Construct mine and store it in `last_mine'
 		require
 			p_exists: p /= Void
@@ -84,7 +73,7 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
-	build_sawmill (p: POSITION): INTEGER is
+	build_sawmill (p: POSITION): DOUBLE is
 			-- Construct sawmill and store it in `last_sawmill'
 		require
 			p_exists: p /= Void
@@ -100,7 +89,7 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
-	build_barrack (p: POSITION): INTEGER is
+	build_barrack (p: POSITION): DOUBLE is
 			-- Construct barrack and store it in `last_barrack'
 		require
 			p_exists: p /= Void
@@ -116,7 +105,7 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
-	build_hall (p: POSITION): INTEGER is
+	build_hall (p: POSITION): DOUBLE is
 			-- Construct hall and store it in `last_hall'
 		require
 			p_exists: p /= Void
@@ -132,7 +121,7 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
-	collect_lumber (tree_position: POSITION; sawmill: SAWMILL): INTEGER is
+	collect_lumber (tree_position: POSITION; sawmill: SAWMILL): DOUBLE is
 			-- Cut trees at `tree_position' and produce lumber with the help of `sawmill'
 			-- Time requered is returned
 		require
@@ -153,7 +142,7 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
-	collect_gold (mine: MINE): INTEGER is
+	collect_gold (mine: MINE): DOUBLE is
 			-- Cut gold at `mine', function returns time spent
 		require
 			mine_exists: mine /= Void
@@ -162,7 +151,7 @@ feature -- Basic operations
 			Result := Result + move (mine.position)
 			io.put_string (out + " is searching for gold in " + mine.out + "%N")
 			Result := Result + mine.produce
-			resource_in_knapsack := create {GOLD}
+			resource_in_knapsack := mine.last_gold
 			Result := Result + resource_in_knapsack.creation_time
 			io.put_string (out + " collected gold in " + mine.out + "%N")
 			accessibility_state := Free

@@ -11,24 +11,27 @@ create
 
 feature {NONE} -- Initialization
 
-    make is
+	hall : HALL
+	barrack : BARRACK
+	mine : MINE
+	sawmill : SAWMILL
+
+	workers : ARRAY [WORKER]
+	soldiers : ARRAY [SOLDIER]
+	powerful_hero : HERO
+	resources : LINKED_LIST [RESOURCE]
+
+	forest_position: POSITION
+
+	make is
             -- Run application.
-        local
-            hall : HALL
-            barrack : BARRACK
-            mine : MINE
-            sawmill : SAWMILL
+		local
+			i: INTEGER
+			time : DOUBLE
+				-- Time elapsed from the very beginning
 
-            workers : ARRAY [WORKER]
-            soldiers : ARRAY [SOLDIER]
-            powerful_hero : HERO
-            resources : LINKED_LIST [RESOURCE]
-
-			forest_position: POSITION
-            i: INTEGER
-            time : INTEGER
-        do
-            create hall.make_at_origin
+		do
+            create hall.make(create {POSITION}.make (0, 0))
 
 			time := time + hall.train_hero
             powerful_hero := hall.last_hero

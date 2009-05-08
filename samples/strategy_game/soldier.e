@@ -16,11 +16,11 @@ create
 feature -- Access
 	type: STRING is "Soldier"
 
-	creation_time: INTEGER is 20
+	creation_time: DOUBLE is 20.0
 			-- Soldier training time
 
-	maximum_movement_speed: INTEGER is 1
+	maximum_movement_speed: DOUBLE is 1.0
 
-	maximum_accuracy: DOUBLE is 0.8
+	maximum_accuracy: DOUBLE is 0.4
 
 end

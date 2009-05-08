@@ -24,7 +24,7 @@ feature -- State dependent: Access
 		end
 
 feature -- Basic operation
-    attack (target: UNIT): INTEGER is
+    attack (target: UNIT): DOUBLE is
             -- Attack some unit
 		local
 			random_value: DOUBLE
@@ -35,9 +35,9 @@ feature -- Basic operation
             create random.make
             random_value := random.double_item
             if random_value > accuracy then
-            	-- If being succeded
+            	-- If ARMY_BEING succeded
             	target.attack_this
             end
-            Result := Result + 1 -- It takes one period of time to attack
+            Result := Result + 1.0 -- It takes one period of time to attack
         end
 end

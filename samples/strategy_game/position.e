@@ -14,42 +14,38 @@ inherit
 		end
 
 create
-	make,
-	make_origin
+	make
 
 feature -- Initialization
 	make (new_x, new_y: INTEGER) is
 			-- Set `x' to `new_x' and `y' to `new_y'
+		local
+			random_value: INTEGER
 		do
 			x := new_x
 			y := new_y
-			state := Forest
+			random_value := (create {RANDOM}.make).item \\ 5
+			inspect
+				random_value
+			when 0 then
+				state := Field
+			when 1 then
+				state := Forest
+			when 2 then
+				state := Jungle
+			when 3 then
+				state := River
+			when 4 then
+				state := Mountain
+			end
 		ensure
 			x_set: x = new_x
 			y_set: y = new_y
 		end
 
-	make_origin is
-			-- Create an origin point
-		do
-			x := 0
-			y := 0
-			state := Forest
-		ensure
-			x_set: x = 0
-			y_set: y = 0
-		end
-
 feature -- Access
 	x: INTEGER
-
 	y: INTEGER
-
-	Origin: POSITION is
-			-- Origin of the world
-		once
-			create Result.make_origin
-		end
 
 feature -- Status report
 	equals (other: POSITION) : BOOLEAN is
@@ -73,19 +69,19 @@ feature -- Output
 		end
 
 feature {NONE}
-	Forest: STATE is once create Result.make ("Forest") end
 	Field: STATE is once create Result.make ("Field") end
-	River: STATE is once create Result.make ("River") end
+	Forest: STATE is once create Result.make ("Forest") end
 	Jungle: STATE is once create Result.make ("Jungle") end
+	River: STATE is once create Result.make ("River") end
 	Mountain: STATE is once create Result.make ("Mountain") end
 
 	sd_crossing_time: STATE_DEPENDENT_FUNCTION [TUPLE, INTEGER] is
 			-- State-dependent function for `crossing_time'
 		once
 			create Result.make(5)
+			Result.add_result (Field, agent : BOOLEAN do Result := True end, 50)
 			Result.add_result (Forest, agent : BOOLEAN do Result := True end, 100)
 			Result.add_result (Jungle, agent : BOOLEAN do Result := True end, 150)
-			Result.add_result (Field, agent : BOOLEAN do Result := True end, 50)
 			Result.add_result (River, agent : BOOLEAN do Result := True end, 200)
 			Result.add_result (Mountain, agent : BOOLEAN do Result := True end, 300)
 		end
