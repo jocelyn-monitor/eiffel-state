@@ -23,10 +23,10 @@ feature -- Access
 
 	last_lumber: LUMBER
 
-	creation_time: INTEGER is 150
+	creation_time: DOUBLE is 20.0
 
 feature -- Basic operation
-	produce: INTEGER is
+	produce: DOUBLE is
 			-- Produce resource and store it into `last_resource'
 		do
 			create last_lumber

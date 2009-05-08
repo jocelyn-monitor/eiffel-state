@@ -11,6 +11,6 @@ inherit
 	RESOURCE
 
 feature -- Access
-	creation_time: INTEGER is 1
+	creation_time: DOUBLE is 1.0
 
 end

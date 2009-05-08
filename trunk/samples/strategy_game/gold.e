@@ -11,6 +11,6 @@ inherit
 	RESOURCE
 
 feature -- Access
-	creation_time: INTEGER is 3
+	creation_time: DOUBLE is 3.0
 
 end

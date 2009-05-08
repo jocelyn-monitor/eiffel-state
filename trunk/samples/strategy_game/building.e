@@ -10,13 +10,7 @@ deferred class
 inherit
 	UNIT
 		rename
-			is_healthy as is_repaired
+			is_healthy as is_repaired,
+			heal_this as repair_this
 		end
-
-feature -- Access
-	creation_time: INTEGER is
-			-- Time required for constructing some Building
-		deferred
-		end
-
 end
