@@ -32,7 +32,7 @@ feature -- Access
 
 	last_gold: GOLD
 
-	max_hit_points: INTEGER is 200
+	creation_time: INTEGER is 200
 
 	gold_amount: INTEGER
 

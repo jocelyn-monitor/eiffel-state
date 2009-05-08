@@ -19,13 +19,13 @@ feature -- Access
 	last_soldier: SOLDIER
 			-- Last trained soldier
 
-	max_hit_points: INTEGER is 300
+	creation_time: INTEGER is 300
 
 feature -- Basic operations
 	train_soldier: INTEGER is
 		do
 			create last_soldier.make (position)
-			Result := Result + (last_soldier.creation_time / sd_ability_decrease.item ([], hp_state)).ceiling
+			Result := Result + (last_soldier.creation_time / sd_ability_decrease.item ([], health_state)).ceiling
 			io.put_string (last_soldier.out + " was trained%N")
 		ensure
 			last_soldier_exists: last_soldier /= Void

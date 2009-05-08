@@ -23,7 +23,7 @@ feature -- Access
 
 	last_lumber: LUMBER
 
-	max_hit_points: INTEGER is 150
+	creation_time: INTEGER is 150
 
 feature -- Basic operation
 	produce: INTEGER is

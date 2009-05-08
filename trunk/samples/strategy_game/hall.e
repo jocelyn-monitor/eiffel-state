@@ -29,14 +29,14 @@ feature -- Access
 	last_hero: HERO
 			-- Last trained hero
 
-	max_hit_points: INTEGER is 500
+	creation_time: INTEGER is 500
 
 feature -- Basic operations
 	train_worker: INTEGER is
 			-- Train worker and store him in `last_worker'
 		do
 			create last_worker.make (position)
-			Result := Result + (last_worker.creation_time / sd_ability_decrease.item ([], hp_state)).ceiling
+			Result := Result + last_worker.creation_time
 			io.put_string (last_worker.out + " has just been trained%N")
 		ensure
 			last_worker_exists: last_worker /= Void
@@ -46,7 +46,7 @@ feature -- Basic operations
 			-- Train hero and store him in `last_hero'
 		do
 			create last_hero.make (position)
-			Result := Result + (last_hero.creation_time / sd_ability_decrease.item ([], hp_state)).ceiling
+			Result := Result + last_hero.creation_time
 			io.put_string (last_hero.out + " has just been trained%N")
 		ensure
 			last_hero_exists: last_hero /= Void

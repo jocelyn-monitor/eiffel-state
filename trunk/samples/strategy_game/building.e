@@ -16,8 +16,7 @@ inherit
 feature -- Access
 	creation_time: INTEGER is
 			-- Time required for constructing some Building
-		do
-			Result := (max_hit_points / {WORKER}.creation_time).rounded
+		deferred
 		end
 
 end

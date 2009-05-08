@@ -11,6 +11,10 @@ inherit
 	UNIT
 
 feature -- Access
+	creation_time: INTEGER is
+		deferred
+		end
+
 	maximum_movement_speed: INTEGER is
 		deferred
 		end
@@ -19,14 +23,13 @@ feature -- State dependent: Access
 	movement_speed: DOUBLE is
 			-- Movement speed according to hp level
 		do
-			Result := maximum_movement_speed * sd_ability_decrease.item ([], hp_state)
+			Result := maximum_movement_speed * sd_ability_decrease.item ([], health_state)
 		end
 
 feature -- Element change
 	move (new_position: POSITION): INTEGER is
 			-- Time which is taken by changing `position' to `new_position'
 		do
-			io.put_string (out + " has moved to " + new_position.out + "%N")
 			from
 			until
 				position.equals (new_position)
@@ -39,6 +42,7 @@ feature -- Element change
 					position := create {POSITION}.make (position.x, position.y + ((new_position.y - position.y) / (new_position.y - position.y).abs).rounded)
 				end
 			end
+			io.put_string (out + " has moved to " + new_position.out + "%N")
 		ensure
 			position_set: position.equals (new_position)
 		end
