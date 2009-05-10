@@ -1,5 +1,5 @@
 note
-	description: "Units that can be created by the player."
+	description: "Units that can be created by the player"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -17,19 +17,24 @@ inherit
 
 feature -- Initialization
 	make (p: POSITION; team: STRING) is
-			-- Create a unit at `p' with maximum hit points
+			-- Create nonselected unit at position `p',
+			-- set his `team_name' to `team' and health to maximum
+		require
+			p_exists: p /= Void
 		do
 			team_name := team
-			Create team_state.make(team)
+			create team_state.make(team)
 			health_state := Alive
 			selected_state := Nonselected
 			position := p
 		ensure
 			position_set: position = p
+			team_state_set: team_state /= Void
 		end
 
 feature -- Access
 	creation_time: DOUBLE is
+			-- Time required to create current unit
 		deferred
 		end
 
@@ -43,9 +48,19 @@ feature -- Access
 		deferred
 		end
 
+	true_agent: BOOLEAN is
+			-- Function which returns true always
+		do
+			Result := True
+		end
+
+
 feature -- Output
 	draw (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
-			-- Draw unit with center position (x, y) using `drawable'
+			-- Draw unit with (x, y) as its center position using `drawable'
+		require
+			drawable_set: drawable /= Void
+			positive_size: size > 0
 		do
 			sd_draw.call ([x, y, size, drawable], selected_state)
 		end
@@ -55,6 +70,8 @@ feature -- Output
 		do
 			drawable.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 0))
 			common_draw (x, y, size, drawable)
+		ensure
+			color_set: drawable.foreground_color /= Void
 		end
 
 	draw_selected (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
@@ -62,6 +79,8 @@ feature -- Output
 		do
 			drawable.set_foreground_color (create {EV_COLOR}.make_with_rgb (1, 0, 0))
 			common_draw (x, y, size, drawable)
+		ensure
+			color_set: drawable.foreground_color /= Void
 		end
 
 	out: STRING is
@@ -78,29 +97,43 @@ feature -- Status report
 		end
 
 feature -- Basic operations
-	attack_this is
-			-- Decrease health when unit is under attack
+	reduce_health is
+			-- Reduce health when unit is under attack
 		do
-			sd_attacked.call([], health_state)
-			health_state := sd_attacked.next_state
+			sd_reduce_health.call([], health_state)
+			health_state := sd_reduce_health.next_state
+		ensure
+			health_state /= Void
 		end
 
-	heal_this: DOUBLE is
-			-- Increase health when unit is healed
+	improve_health: DOUBLE is
+			-- Improve health when unit is healed
+			-- and return time needed for this operation
 		do
-			sd_healed.call([], health_state)
-			health_state := sd_healed.next_state
+			sd_improve_health.call([], health_state)
+			health_state := sd_improve_health.next_state
 			Result := creation_time / 4
+		ensure
+			health_state /= Void
 		end
 
-feature -- Change state
-	change_selected_state is
+	select_ is
+			-- Change unit's `selected_state' when unit was selected
 		do
-			sd_change_selected_state.call ([], selected_state)
+			sd_select.call ([], selected_state)
+			selected_state := sd_select.next_state
+		end
+
+	deselect is
+			-- Change unit's `selected_state' when unit was deselected
+		do
+			sd_deselect.call ([], selected_state)
+			selected_state := sd_deselect.next_state
 		end
 
 feature {NONE} -- Output
 	common_draw (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
+			-- Draws text in the cell where unit is situated
 		do
 			drawable.set_font (
 				create {EV_FONT}.make_with_values ({EV_FONT_CONSTANTS}.Family_roman,
@@ -109,12 +142,11 @@ feature {NONE} -- Output
 												   8)
 			)
 			drawable.draw_text (x - size // 2, y + size // 2, type)
+		ensure
+			drawable.font /= Void
 		end
 
 feature {NONE} -- States
-
-	team_state: STATE
-			-- This unit belongs to `team_state'
 	Alive: STATE is once create Result.make ("Alive") end
 	Injured: STATE is once create Result.make ("Injured") end
 	Seriously_injured: STATE is once create Result.make ("Seriously injured") end
@@ -125,18 +157,22 @@ feature {NONE} -- States
 	Selected: STATE is once create Result.make ("Selected") end
 	Nonselected: STATE is once create Result.make ("Nonselected") end
 
+	team_state: STATE
+			-- This unit belongs to `team_state'
+
 feature {NONE} -- State dependent implementation
 
-	sd_healed: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+	sd_improve_health: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- State dependent procedure which changes state when unit is being healed
 		once
 			create Result.make (3)
-			Result.add_behavior (Alive, agent: BOOLEAN do Result := True end, agent do end, Alive)
-			Result.add_behavior (Injured, agent: BOOLEAN do Result := True end, agent do end, Alive)
-			Result.add_behavior (Seriously_injured, agent: BOOLEAN do Result := True end, agent do end, Injured)
+
+			Result.add_behavior (Alive, agent true_agent, agent do_nothing, Alive)
+			Result.add_behavior (Injured, agent true_agent, agent do_nothing, Alive)
+			Result.add_behavior (Seriously_injured, agent true_agent, agent do_nothing, Injured)
 		end
 
-	sd_attacked: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+	sd_reduce_health: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- State dependent procedure which changes state when unit is under attack
 		once
 			create Result.make(3)
@@ -153,14 +189,19 @@ feature {NONE} -- State dependent implementation
 			Result.add_behavior (Nonselected, agent: BOOLEAN do Result := True end, agent draw_nonselected, Nonselected)
 		end
 
-	sd_change_selected_state: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+	sd_select: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 		once
-			create Result.make (2)
-			Result.add_behavior (Selected, agent: BOOLEAN do Result := True end, agent do end, Nonselected)
+			create Result.make (1)
 			Result.add_behavior (Nonselected, agent: BOOLEAN do Result := True end, agent do end, Selected)
 		end
 
-	sd_ability_decrease: STATE_DEPENDENT_FUNCTION [TUPLE, DOUBLE] is
+	sd_deselect: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+		once
+			create Result.make (1)
+			Result.add_behavior (Selected, agent: BOOLEAN do Result := True end, agent do end, Nonselected)
+		end
+
+	sd_ability_reduction: STATE_DEPENDENT_FUNCTION [TUPLE, DOUBLE] is
 			-- State-dependent function which changes abilities of beings: movement speed, attack accuracy
 		once
 			create Result.make(4)
@@ -174,4 +215,7 @@ invariant
 	position_exists: position /= Void
 	type_exists: type /= Void
 	type_nonempty: not type.is_empty
+	health_state_exists: health_state /= Void
+	team_state_exists: team_state /= Void
+	selected_state_exists: selected_state /= Void
 end

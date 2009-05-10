@@ -1,5 +1,5 @@
 note
-	description: "Positions in the game world."
+	description: "Position of some unit in the game world"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -18,7 +18,12 @@ create
 
 feature -- Initialization
 	make (new_x, new_y, relief_type: INTEGER) is
-			-- Set `x' to `new_x' and `y' to `new_y', set state value according to `relief_type'
+			-- Set `x' to `new_x' and `y' to `new_y',
+			-- set `state' value according to `relief_type'
+		require
+			non_negative_x: new_x >= 0
+			non_negative_y: new_y >= 0
+			proper_relief_type: relief_type >= 1 and relief_type <= relief_types
 		do
 			x := new_x
 			y := new_y
@@ -76,7 +81,7 @@ feature -- Output
 feature {NONE} -- Implementation
 
 	sd_crossing_time: STATE_DEPENDENT_FUNCTION [TUPLE, INTEGER] is
-			-- State-dependent function for `crossing_time'
+			-- State-dependent function for `crossing_time' function
 		local
 			i: INTEGER
 		once
@@ -92,7 +97,7 @@ feature {NONE} -- Implementation
 		end
 
 	sd_color: STATE_DEPENDENT_FUNCTION [TUPLE, EV_COLOR] is
-			-- State-dependent function for `crossing_time'
+			-- State-dependent function for `color' function
 		local
 			i: INTEGER
 		once
@@ -114,6 +119,7 @@ feature {NONE} -- Implementation
 		end
 
 	States: ARRAY [STATE] is
+			-- Array with states for all relief types
 		once
 			Result := <<
 				create {STATE}.make ("Field"),
@@ -125,13 +131,13 @@ feature {NONE} -- Implementation
 		end
 
 	Crossing_times: ARRAY[INTEGER] is
-			-- Returns times required to cross cells
+			-- Times required to cross cells
 		once
 			Result := <<50, 100, 150, 200, 300>>
 		end
 
 	Colors: ARRAY[EV_COLOR] is
-			-- Color to fill cell in the window
+			-- Colors to fill cell in the window
 		once
 			Result := <<
 				create {EV_COLOR}.make_with_rgb (1, 1, 0),
@@ -142,5 +148,7 @@ feature {NONE} -- Implementation
 			>>
 		end
 
-
+invariant
+	proper_relief: not relief.is_empty
+	not out.is_empty
 end

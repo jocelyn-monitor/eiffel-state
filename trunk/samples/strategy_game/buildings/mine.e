@@ -34,10 +34,13 @@ feature -- Access
 	creation_time: DOUBLE is 20.0
 
 	gold_mined: INTEGER
+			-- Gold portions which were mined there
 
 	middle_depreciation_level: INTEGER is 1000
+			-- After this level mining needs additional time
 
 	heavy_depreciation_level: INTEGER is 3000
+			-- After this level mining needs much more time
 
 feature -- State dependent: Access
 	collecting_time: DOUBLE is
@@ -57,6 +60,7 @@ feature -- Basic operations
 		end
 
 feature {NONE} -- Implementation
+	exhausted_state: STATE
 	Weak_depreciation: STATE is once create Result.make ("Weak depreciation") end
 	Medium_depreciation: STATE is once create Result.make ("Medium depreciation") end
 	Heavy_depreciation: STATE is once create Result.make ("Heavy depreciation") end
@@ -87,6 +91,8 @@ feature {NONE} -- Implementation
 			Result.add_behavior (Weak_depreciation, agent is_medium_depreciation, agent do end, Medium_depreciation)
 			Result.add_behavior (Medium_depreciation, agent is_heavy_depreciation, agent do end, Heavy_depreciation)
 		end
-
-	exhausted_state: STATE
+invariant
+	exhausted_state /= Void
+	gold_mined >= 0
+	not type.is_empty
 end

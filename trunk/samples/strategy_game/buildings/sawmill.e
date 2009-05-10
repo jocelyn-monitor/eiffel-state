@@ -1,5 +1,5 @@
 note
-	description: "Sawmills that produce lamber from trees."
+	description: "Sawmills that produce LUMBER from FELLED_TREE"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -25,12 +25,23 @@ feature -- Access
 
 	creation_time: DOUBLE is 20.0
 
+	felled_tree_amount: INTEGER
+
 feature -- Basic operations
+	deliver_felled_tree (tree: FELLED_TREE) is
+			-- Worker should deliver `FELLED_TREE' before producing `LUMBER'
+		do
+			felled_tree_amount := felled_tree_amount + 1
+		end
+
 	produce: DOUBLE is
-			-- Produce resource and store it into `last_resource'
+			-- Produce resource and store it into `last_lumber'
+		require else
+			felled_tree_amount >= 0
 		do
 			create last_lumber
 			Result := last_lumber.creation_time
+			felled_tree_amount := felled_tree_amount - 1
 		end
 
 end

@@ -48,7 +48,7 @@ feature -- Basic operations
 			until
 				not b.is_repaired
 			loop
-				Result := Result + b.repair_this
+				Result := Result + b.repair
 			end
 			io.put_string (out + " has repaired building%N")
 			accessibility_state := Free

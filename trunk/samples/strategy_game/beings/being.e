@@ -19,7 +19,7 @@ feature -- State dependent: Access
 	movement_speed: DOUBLE is
 			-- Movement speed according to hp level
 		do
-			Result := maximum_movement_speed * sd_ability_decrease.item ([], health_state)
+			Result := maximum_movement_speed * sd_ability_reduction.item ([], health_state)
 		end
 
 feature -- Element change
