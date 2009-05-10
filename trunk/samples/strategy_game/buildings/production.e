@@ -13,7 +13,7 @@ inherit
 feature -- Access
 	last_resource: RESOURCE
 
-feature -- Basic operation
+feature -- Basic operations
 	produce: DOUBLE is
 			-- Produce resource and store it into `last_resource', return time required
 		deferred

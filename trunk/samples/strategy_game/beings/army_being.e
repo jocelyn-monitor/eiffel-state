@@ -23,7 +23,7 @@ feature -- State dependent: Access
 			Result := maximum_accuracy * sd_ability_decrease.item([], health_state)
 		end
 
-feature -- Basic operation
+feature -- Basic operations
     attack (target: UNIT): DOUBLE is
             -- Attack some unit
 		local

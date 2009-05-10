@@ -24,10 +24,11 @@ feature -- Access
 feature -- Basic operations
 	train_soldier: DOUBLE is
 		do
-			create last_soldier.make (position)
+			create last_soldier.make (position, team_name)
 			Result := Result + last_soldier.creation_time
 			io.put_string (last_soldier.out + " was trained%N")
 		ensure
 			last_soldier_exists: last_soldier /= Void
 		end
+
 end

@@ -17,35 +17,34 @@ create
 	make
 
 feature -- Initialization
-	make (new_x, new_y: INTEGER) is
-			-- Set `x' to `new_x' and `y' to `new_y'
-		local
-			random_value: INTEGER
+	make (new_x, new_y, relief_type: INTEGER) is
+			-- Set `x' to `new_x' and `y' to `new_y', set state value according to `relief_type'
 		do
 			x := new_x
 			y := new_y
-			random_value := (create {RANDOM}.make).item \\ 5
-			inspect
-				random_value
-			when 0 then
-				state := Field
-			when 1 then
-				state := Forest
-			when 2 then
-				state := Jungle
-			when 3 then
-				state := River
-			when 4 then
-				state := Mountain
-			end
+			state := relief_state (relief_type)
 		ensure
 			x_set: x = new_x
 			y_set: y = new_y
+			state_set: state /= Void
 		end
 
 feature -- Access
 	x: INTEGER
 	y: INTEGER
+
+	relief_types: INTEGER is 5
+
+	relief_name (relief_type: INTEGER): STRING is
+			-- Returns name of relief corresponding to `relief_type' type
+		do
+			Result := relief_state(relief_type).name
+		end
+
+	relief: STRING is
+		do
+			Result := state.name
+		end
 
 feature -- Status report
 	equals (other: POSITION) : BOOLEAN is
@@ -57,33 +56,91 @@ feature -- Status report
 feature -- State dependent: Status report
 	crossing_time: INTEGER is
 			-- It takes `crossing_time' to cross cell with this coordinates according to its relief
-			do
-				Result := sd_crossing_time.item ([], state)
-			end
+		do
+			Result := sd_crossing_time.item ([], state)
+		end
+
+	color: EV_COLOR is
+			-- Draws current cell, using its' relief
+		do
+			Result := sd_color.item ([], state)
+		end
 
 feature -- Output
 	out: STRING is
-			-- String representation in form (`x', `y', `Relief')
+			-- String representation in form (`x', `y', `relief')
 		do
-			Result := "(" + x.out + ", " + y.out + ", " + state.name + ")"
+			Result := "(" + x.out + ", " + y.out + ", " + relief + ")"
 		end
 
-feature {NONE}
-	Field: STATE is once create Result.make ("Field") end
-	Forest: STATE is once create Result.make ("Forest") end
-	Jungle: STATE is once create Result.make ("Jungle") end
-	River: STATE is once create Result.make ("River") end
-	Mountain: STATE is once create Result.make ("Mountain") end
+feature {NONE} -- Implementation
 
 	sd_crossing_time: STATE_DEPENDENT_FUNCTION [TUPLE, INTEGER] is
 			-- State-dependent function for `crossing_time'
+		local
+			i: INTEGER
 		once
-			create Result.make(5)
-			Result.add_result (Field, agent : BOOLEAN do Result := True end, 50)
-			Result.add_result (Forest, agent : BOOLEAN do Result := True end, 100)
-			Result.add_result (Jungle, agent : BOOLEAN do Result := True end, 150)
-			Result.add_result (River, agent : BOOLEAN do Result := True end, 200)
-			Result.add_result (Mountain, agent : BOOLEAN do Result := True end, 300)
+			create Result.make(States.count)
+			from
+				i := 1
+			until
+				i = States.count + 1
+			loop
+				Result.add_result (States @ i, agent : BOOLEAN do Result := True end, Crossing_times @ i)
+				i := i + 1
+			end
 		end
+
+	sd_color: STATE_DEPENDENT_FUNCTION [TUPLE, EV_COLOR] is
+			-- State-dependent function for `crossing_time'
+		local
+			i: INTEGER
+		once
+			create Result.make(States.count)
+			from
+				i := 1
+			until
+				i = States.count + 1
+			loop
+				Result.add_result (States @ i, agent : BOOLEAN do Result := True end, Colors @ i)
+				i := i + 1
+			end
+		end
+
+	relief_state (relief_type: INTEGER): STATE is
+			-- Returns name of relief corresponding to `relief_type' type
+		do
+			Result := States @ relief_type
+		end
+
+	States: ARRAY [STATE] is
+		once
+			Result := <<
+				create {STATE}.make ("Field"),
+				create {STATE}.make ("Forest"),
+				create {STATE}.make ("Jungle"),
+				create {STATE}.make ("Water"),
+				create {STATE}.make ("Mountain")
+			>>
+		end
+
+	Crossing_times: ARRAY[INTEGER] is
+			-- Returns times required to cross cells
+		once
+			Result := <<50, 100, 150, 200, 300>>
+		end
+
+	Colors: ARRAY[EV_COLOR] is
+			-- Color to fill cell in the window
+		once
+			Result := <<
+				create {EV_COLOR}.make_with_rgb (1, 1, 0),
+				create {EV_COLOR}.make_with_rgb (0.28, 0.72, 0.3),
+				create {EV_COLOR}.make_with_rgb (0.14, 1, 0.07),
+				create {EV_COLOR}.make_with_rgb (0.11, 0.73, 0.89),
+				create {EV_COLOR}.make_with_rgb (0.56, 0.5, 0.44)
+			>>
+		end
+
 
 end

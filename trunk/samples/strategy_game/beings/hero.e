@@ -23,12 +23,14 @@ feature -- Access
 
 	maximum_accuracy: DOUBLE is 0.8
 
-feature -- Besic operation
+feature -- Basic operations
 	heal_being (b: BEING): DOUBLE is
 			-- Heal some being
 		do
 			io.put_string (out + " is healing " + b.out + "%N")
 			Result := b.heal_this
 		end
+
+feature {NONE} -- Implementation
 
 end

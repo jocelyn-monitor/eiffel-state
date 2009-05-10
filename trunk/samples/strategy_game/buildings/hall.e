@@ -28,7 +28,7 @@ feature -- Basic operations
 	train_worker: DOUBLE is
 			-- Train worker and store him in `last_worker'
 		do
-			create last_worker.make (position)
+			create last_worker.make (position, team_name)
 			Result := Result + last_worker.creation_time
 			io.put_string (last_worker.out + " has just been trained%N")
 		ensure
@@ -38,7 +38,7 @@ feature -- Basic operations
 	train_hero: DOUBLE is
 			-- Train hero and store him in `last_hero'
 		do
-			create last_hero.make (position)
+			create last_hero.make (position, team_name)
 			Result := Result + last_hero.creation_time
 			io.put_string (last_hero.out + " has just been trained%N")
 		ensure
