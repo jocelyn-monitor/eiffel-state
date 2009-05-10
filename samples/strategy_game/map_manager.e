@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {MAP_MANAGER}."
+	description: "This class manages map and positions on it"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -17,19 +17,33 @@ create
 	default_create
 
 feature -- Access
-	width: INTEGER is 20
-
-	height: INTEGER is 20
-
-	Cell_size: INTEGER is 30
+	Cell_size: INTEGER
 			-- Size of every relief cell
 
+	width: INTEGER
+		-- Width of `current_game_map'
+
+	height: INTEGER
+		-- Height of `current_game_map'
+
+	maps_number: INTEGER is
+		do
+			Result := maps.count
+		end
+
 	position_at (x, y: INTEGER): POSITION is
+			-- `POSITION' object, which corresponds to (x, y) point in the window
+		do
+			Result := position (x // Cell_size, y // Cell_size)
+		end
+
+
+	position (x, y: INTEGER): POSITION is
 			-- Returns `POSITION' object, which contains (x, y) relief
 		require
 			coordinates_in_bounds: x >= 0 and x < width and y >= 0 and y < height
 		do
-			Result := relief @ x @ y
+			Result := current_game_map.relief @ x @ y
 		ensure
 			Result /= Void
 		end
@@ -46,33 +60,10 @@ feature -- Access
 			until
 				i >= width or Result /= Void
 			loop
-				p := position_at (i, j)
+				p := position (i, j)
 				if (p.relief_name(relief_type).is_equal (p.relief)) then
 					Result := p
 				end
-				j := j + 1
-				if (j >= height) then
-					j := 0
-					i := i + 1
-				end
-			end
-		end
-
-	draw_map (drawable: EV_DRAWABLE) is
-			-- Draws the whole map in the window using `drawable'
-		local
-			color: EV_COLOR
-			i, j: INTEGER
-		do
-			from
-				i := 0
-				j := 0
-			until
-				i >= width
-			loop
-				color := position_at (i, j).color
-				drawable.set_foreground_color (color)
-				drawable.fill_rectangle (i * Cell_size, j * Cell_size, Cell_size, Cell_size)
 				j := j + 1
 				if (j >= height) then
 					j := 0
@@ -87,47 +78,63 @@ feature -- Access
 			Result := <<p.x * Cell_size + Cell_size // 2, p.y * Cell_size + Cell_size // 2>>
 		end
 
+feature -- Basic operations
+	draw_map_rect_part (drawable: EV_DRAWABLE; x, y: INTEGER_INTERVAL) is
+			-- Draws rectangle part of the map in the window using `drawable'
+		local
+			color: EV_COLOR
+			i, j: INTEGER
+		do
+			from
+				i := x.lower
+				j := y.lower
+			until
+				i = x.upper + 1
+			loop
+				color := position (i, j).color
+				drawable.set_foreground_color (color)
+				drawable.fill_rectangle (i * Cell_size, j * Cell_size, Cell_size, Cell_size)
+				j := j + 1
+				if (j = y.upper + 1) then
+					j := y.lower
+					i := i + 1
+				end
+			end
+		end
+
+	draw_map (drawable: EV_DRAWABLE) is
+			-- Draws the map in the window using `drawable'
+		do
+			draw_map_rect_part (drawable, create {INTEGER_INTERVAL}.make (0, width - 1), create {INTEGER_INTERVAL}.make (0, height - 1))
+		end
+
+	set_game_map (index: INTEGER) is
+			-- Choose game map by index
+		require
+			proper_index: index >= 1 and index <= maps_number
+		do
+			current_game_map := maps @ index
+			width := current_game_map.width
+			height := current_game_map.height
+		ensure
+			current_game_map /= Void
+		end
+
+
 feature {NONE} -- Initialization
 	default_create is
 			-- Initialize map relief
 		do
-			create_random_map(1)
-		end
-
-	create_random_map (seed: INTEGER) is
-			-- Generates random map using pseudo-random generator
-		local
-			i, j: INTEGER
-			relief_generator: RANDOM
-			cur_arr: ARRAY [POSITION]
-			pos: POSITION
-			cur_relief: INTEGER
-		do
-			create relief_generator.make
-			cur_relief := seed
-			create relief.make (0, width - 1)
-			from
-				i := 0
-			until
-				i >= width
-			loop
-				create cur_arr.make (0, height - 1)
-				relief.put (cur_arr, i)
-				from
-					j := 0
-				until
-					j >= height
-				loop
-					cur_relief := relief_generator.next_random (cur_relief)
-					create pos.make (i, j, cur_relief \\ {POSITION}.relief_types + 1)
-					cur_arr.put (pos, j)
-					j := j + 1
-				end
-				i := i + 1
-			end
+			Cell_size := 30
+			create maps.make (1, 2)
+			maps.put (create {MAP}.create_random (1), 1)
+			maps.put (create {MAP}.create_random (2), 2)
 		end
 
 feature {NONE} -- Implementation
-	relief: ARRAY [ARRAY [POSITION]]
+	maps: ARRAY[MAP]
+		-- Maps which can be used in game
 
+	current_game_map: MAP
+		-- Map for current game
 end

@@ -1,5 +1,5 @@
 note
-	description: "Heroes that can heal other beings and are more powerful in a battle."
+	description: "Hero is more powerful in a battle"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -22,15 +22,5 @@ feature -- Access
 	maximum_movement_speed: DOUBLE is 1.5
 
 	maximum_accuracy: DOUBLE is 0.8
-
-feature -- Basic operations
-	heal_being (b: BEING): DOUBLE is
-			-- Heal some being
-		do
-			io.put_string (out + " is healing " + b.out + "%N")
-			Result := b.heal_this
-		end
-
-feature {NONE} -- Implementation
 
 end

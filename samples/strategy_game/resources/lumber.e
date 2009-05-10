@@ -1,5 +1,5 @@
 note
-	description: "Lumber."
+	description: "Lumber prepared for use. It's being obtained in SAWMILL"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

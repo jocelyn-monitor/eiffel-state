@@ -1,5 +1,5 @@
 note
-	description: "Lumber."
+	description: "Raw lumber after tree has been cut"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

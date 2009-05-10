@@ -1,5 +1,5 @@
 note
-	description: "Buildings that cannot move."
+	description: "Deferred class for all buildings"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -11,6 +11,6 @@ inherit
 	UNIT
 		rename
 			is_healthy as is_repaired,
-			heal_this as repair_this
+			improve_health as repair
 		end
 end

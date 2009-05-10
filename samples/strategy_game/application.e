@@ -23,7 +23,6 @@ feature {NONE} -- Initialization
 		end
 
 feature {NONE} -- Implementation
-
 	gui_manager: GUI_MANAGER
 
 end

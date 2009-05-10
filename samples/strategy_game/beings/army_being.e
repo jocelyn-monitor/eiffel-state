@@ -20,7 +20,7 @@ feature -- State dependent: Access
 	accuracy: DOUBLE is
 			-- Power can be reduced by pains
 		do
-			Result := maximum_accuracy * sd_ability_decrease.item([], health_state)
+			Result := maximum_accuracy * sd_ability_reduction.item([], health_state)
 		end
 
 feature -- Basic operations
@@ -30,14 +30,18 @@ feature -- Basic operations
 			random_value: DOUBLE
 			random: RANDOM
         do
-            io.put_string ("Attacking " + target.out + "%N")
-            Result := Result + move (target.position)
-            create random.make
-            random_value := random.double_item
-            if random_value > accuracy then
-            	-- If ARMY_BEING succeded
-            	target.attack_this
-            end
-            Result := Result + 1.0 -- It takes one period of time to attack
+        	if (team_name = target.team_name) then
+        		io.put_string (target.out + " can't attack his ally " + target.out + "%N")
+        	else
+	            io.put_string ("Attacking " + target.out + "%N")
+	            Result := Result + move (target.position)
+	            create random.make
+	            random_value := random.double_item
+	            if random_value > accuracy then
+	            	-- If ARMY_BEING succeded
+	            	target.reduce_health
+	            end
+	            Result := Result + 1.0 -- It takes one period of time to attack
+			end
         end
 end

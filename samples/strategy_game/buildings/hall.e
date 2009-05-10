@@ -1,5 +1,5 @@
 note
-	description: "City halls that train workers and heroes."
+	description: "City halls that train workers, heroes and doctors."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -16,33 +16,44 @@ create
 feature -- Access
 	type: STRING is "Hall"
 
-	last_worker: WORKER
-			-- Last trained worker
-
-	last_hero: HERO
-			-- Last trained hero
+	last_trained: BEING
+			-- Last trained `BEING'
 
 	creation_time: DOUBLE is 50.0
+			-- Time required to build hall
 
 feature -- Basic operations
 	train_worker: DOUBLE is
-			-- Train worker and store him in `last_worker'
+			-- Train worker and store him in `last_trained'
 		do
-			create last_worker.make (position, team_name)
-			Result := Result + last_worker.creation_time
-			io.put_string (last_worker.out + " has just been trained%N")
-		ensure
-			last_worker_exists: last_worker /= Void
+			last_trained := create {WORKER}.make (position, team_name)
+			Result := train_being
 		end
 
 	train_hero: DOUBLE is
-			-- Train hero and store him in `last_hero'
+			-- Train hero and store him in `last_trained'
 		do
-			create last_hero.make (position, team_name)
-			Result := Result + last_hero.creation_time
-			io.put_string (last_hero.out + " has just been trained%N")
-		ensure
-			last_hero_exists: last_hero /= Void
+			last_trained := create {HERO}.make (position, team_name)
+			Result := train_being
 		end
+
+	train_doctor: DOUBLE is
+			-- Train doctor and store him in `last_trained'
+		do
+			last_trained := create {DOCTOR}.make (position, team_name)
+			Result := train_being
+		end
+
+feature {NONE} -- Implementation
+
+	train_being: DOUBLE is
+			-- Train some being
+		do
+			Result := last_trained.creation_time
+			io.put_string (last_trained.out + " has just been trained%N")
+		ensure
+			last_trained_exists: last_trained /= Void
+		end
+
 
 end
