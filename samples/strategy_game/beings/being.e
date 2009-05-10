@@ -26,18 +26,7 @@ feature -- Element change
 	move (new_position: POSITION): DOUBLE is
 			-- Time which is taken by changing `position' to `new_position'
 		do
-			from
-			until
-				position.equals (new_position)
-			loop
-				if (position.x /= new_position.x) then
-					position := create {POSITION}.make (position.x + ((new_position.x - position.x) / (new_position.x - position.x).abs).rounded, position.y)
-				end
-				if (position.y /= new_position.y) then
-					position := create {POSITION}.make (position.x, position.y + ((new_position.y - position.y) / (new_position.y - position.y).abs).rounded)
-				end
-				Result := Result + position.crossing_time / movement_speed
-			end
+			position := new_position
 			io.put_string (out + " has moved to " + new_position.out + "%N")
 		ensure
 			position_set: position.equals (new_position)

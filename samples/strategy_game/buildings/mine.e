@@ -19,10 +19,10 @@ create {WORKER}
 	make
 
 feature -- Initialization
-	make (p: POSITION) is
+	make (p: POSITION; team: STRING) is
 			-- creates mine at `p' position
 		do
-			Precursor {PRODUCTION} (p)
+			Precursor {PRODUCTION} (p, team)
 			exhausted_state := Weak_depreciation
 		end
 
@@ -46,7 +46,7 @@ feature -- State dependent: Access
 			Result := sd_collecting_time.item([], exhausted_state)
 		end
 
-feature -- Basic operation
+feature -- Basic operations
 	produce: DOUBLE is
 			-- Produce bar of gold and store it into `last_gold'
 		do
@@ -56,14 +56,19 @@ feature -- Basic operation
 			sd_produce.call ([], exhausted_state)
 		end
 
-feature {NONE}
+feature {NONE} -- Implementation
 	Weak_depreciation: STATE is once create Result.make ("Weak depreciation") end
 	Medium_depreciation: STATE is once create Result.make ("Medium depreciation") end
 	Heavy_depreciation: STATE is once create Result.make ("Heavy depreciation") end
 
-	is_heavily_used: BOOLEAN
+	is_medium_depreciation: BOOLEAN is
 		do
-			Result := True
+			Result := gold_mined >= middle_depreciation_level
+		end
+
+	is_heavy_depreciation: BOOLEAN is
+		do
+			Result := gold_mined >= heavy_depreciation_level
 		end
 
 	sd_collecting_time: STATE_DEPENDENT_FUNCTION [TUPLE, DOUBLE] is
@@ -79,8 +84,8 @@ feature {NONE}
 			-- State-dependent procedure for `produce'
 		once
 			create Result.make(2)
-			Result.add_behavior (Weak_depreciation, agent: BOOLEAN do Result := True end, agent do end, Medium_depreciation)
-			Result.add_behavior (Medium_depreciation, agent: BOOLEAN do Result := True end, agent do end, Heavy_depreciation)
+			Result.add_behavior (Weak_depreciation, agent is_medium_depreciation, agent do end, Medium_depreciation)
+			Result.add_behavior (Medium_depreciation, agent is_heavy_depreciation, agent do end, Heavy_depreciation)
 		end
 
 	exhausted_state: STATE

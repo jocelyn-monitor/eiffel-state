@@ -64,7 +64,7 @@ feature -- Basic operations
 		do
 			accessibility_state := Busy
 			Result := Result + move (p)
-			create last_mine.make (p)
+			create last_mine.make (p, team_name)
 			Result := Result + last_mine.creation_time
 			io.put_string (last_mine.out + " was just constructed%N")
 			accessibility_state := Free
@@ -80,7 +80,7 @@ feature -- Basic operations
 		do
 			accessibility_state := Busy
 			Result := Result + move (p)
-			create last_sawmill.make (p)
+			create last_sawmill.make (p, team_name)
 			Result := Result + last_sawmill.creation_time
 			io.put_string (last_sawmill.out + " was just constructed%N")
 			accessibility_state := Free
@@ -96,7 +96,7 @@ feature -- Basic operations
 		do
 			accessibility_state := Busy
 			Result := Result + move (p)
-			create last_barrack.make (p)
+			create last_barrack.make (p, team_name)
 			Result := Result + last_barrack.creation_time
 			io.put_string (last_barrack.out + " was just constructed%N")
 			accessibility_state := Free
@@ -112,7 +112,7 @@ feature -- Basic operations
 		do
 			accessibility_state := Busy
 			Result := Result + move (p)
-			create last_hall.make (p)
+			create last_hall.make (p, team_name)
 			Result := Result + last_hall.creation_time
 			io.put_string (last_barrack.out + " was just constructed%N")
 			accessibility_state := Free
@@ -160,9 +160,9 @@ feature -- Basic operations
 		end
 
 feature -- Initialization
-	make (p: POSITION) is
+	make (p: POSITION; team: STRING) is
 		do
-			Precursor {BEING} (p)
+			Precursor {BEING} (p, team)
 			accessibility_state := Free
 		end
 

@@ -25,11 +25,12 @@ feature -- Access
 
 	creation_time: DOUBLE is 20.0
 
-feature -- Basic operation
+feature -- Basic operations
 	produce: DOUBLE is
 			-- Produce resource and store it into `last_resource'
 		do
 			create last_lumber
 			Result := last_lumber.creation_time
 		end
+
 end
