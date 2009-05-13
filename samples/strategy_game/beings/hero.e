@@ -1,5 +1,5 @@
 note
-	description: "Hero is more powerful in a battle"
+	description: "Hero is more powerful in a battle."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

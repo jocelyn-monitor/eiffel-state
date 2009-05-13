@@ -1,8 +1,8 @@
 indexing
-	description	: "Main window for this application"
+	description	: "Main window for this application."
 	author		: ""
-	date		: "$Date: 2009/5/9 19:4:40 $"
-	revision	: "1.0.0"
+	date		: "$Date$"
+	revision	: "$Revision$"
 
 class
 	MAIN_WINDOW

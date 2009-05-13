@@ -1,5 +1,5 @@
 note
-	description: "Position of some unit in the game world"
+	description: "Position of some unit in the game world."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

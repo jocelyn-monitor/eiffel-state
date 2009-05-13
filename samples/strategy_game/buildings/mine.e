@@ -9,10 +9,8 @@ class
 
 inherit
 	PRODUCTION
-		rename
-			last_resource as last_gold
 		redefine
-			last_gold, make
+			make
 		end
 
 create {WORKER}
@@ -29,18 +27,10 @@ feature -- Initialization
 feature -- Access
 	type: STRING is "Mine"
 
-	last_gold: GOLD
-
 	creation_time: DOUBLE is 20.0
 
 	gold_mined: INTEGER
 			-- Gold portions which were mined there
-
-	middle_depreciation_level: INTEGER is 1000
-			-- After this level mining needs additional time
-
-	heavy_depreciation_level: INTEGER is 3000
-			-- After this level mining needs much more time
 
 feature -- State dependent: Access
 	collecting_time: DOUBLE is
@@ -50,13 +40,12 @@ feature -- State dependent: Access
 		end
 
 feature -- Basic operations
-	produce: DOUBLE is
+	produce: GOLD is
 			-- Produce bar of gold and store it into `last_gold'
 		do
-			create last_gold
-			Result := collecting_time + last_gold.creation_time
 			gold_mined := gold_mined + 1
 			sd_produce.call ([], exhausted_state)
+			create Result
 		end
 
 feature {NONE} -- Implementation
@@ -64,6 +53,12 @@ feature {NONE} -- Implementation
 	Weak_depreciation: STATE is once create Result.make ("Weak depreciation") end
 	Medium_depreciation: STATE is once create Result.make ("Medium depreciation") end
 	Heavy_depreciation: STATE is once create Result.make ("Heavy depreciation") end
+
+	middle_depreciation_level: INTEGER is 1000
+			-- After this level mining needs additional time
+
+	heavy_depreciation_level: INTEGER is 3000
+			-- After this level mining needs much more time
 
 	is_medium_depreciation: BOOLEAN is
 		do

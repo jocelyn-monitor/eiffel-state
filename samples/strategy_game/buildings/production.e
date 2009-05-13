@@ -9,16 +9,21 @@ deferred class
 
 inherit
 	BUILDING
+	   	redefine
+    		actions
+    	end
 
 feature -- Access
-	last_resource: RESOURCE
+
+	actions: LIST [ACTION [TUPLE]] is
+		do
+			Result := Void
+		end
 
 feature -- Basic operations
-	produce: DOUBLE is
-			-- Produce resource and store it into `last_resource', return time required
+	produce: RESOURCE is
+			-- Produce resource
 		deferred
-		ensure
-			last_resource /= Void
 		end
 
 end

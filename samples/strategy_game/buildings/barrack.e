@@ -16,19 +16,18 @@ create {WORKER}
 feature -- Access
 	type: STRING is "Barrack"
 
-	last_soldier: SOLDIER
-			-- Last trained soldier
-
 	creation_time: DOUBLE is 30.0
 
-feature -- Basic operations
-	train_soldier: DOUBLE is
+	actions: LIST [ACTION [TUPLE]] is
 		do
-			create last_soldier.make (position, team_name)
-			Result := Result + last_soldier.creation_time
-			io.put_string (last_soldier.out + " was trained%N")
-		ensure
-			last_soldier_exists: last_soldier /= Void
+			Result := Void
+		end
+
+feature -- Basic operations
+	train_soldier: SOLDIER is
+		do
+			create Result.make (position, team_name)
+			io.put_string (Result.out + " was trained%N")
 		end
 
 end

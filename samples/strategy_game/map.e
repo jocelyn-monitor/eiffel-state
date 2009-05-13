@@ -1,5 +1,5 @@
 note
-	description: "Game map"
+	description: "Game map."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -28,7 +28,7 @@ feature -- Initialization
 		do
 			width := 20
 			height := 20
-			
+
 			create relief_generator.make
 			cur_relief := seed
 			create relief.make (0, width - 1)
