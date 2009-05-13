@@ -35,7 +35,7 @@ feature -- Basic operations
 				behaviors.found_item.extend ([guard, action, target])
 			else
 				create list.make
-				list.extend ([guard, action, target])
+				list.put_front ([guard, action, target])
 				behaviors.extend (list, state)
 			end
 		end

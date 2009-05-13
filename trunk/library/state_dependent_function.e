@@ -33,7 +33,7 @@ feature -- Basic operations
 				behaviors.found_item.extend ([guard, function])
 			else
 				create list.make
-				list.extend ([guard, function])
+				list.put_front ([guard, function])
 				behaviors.extend (list, state)
 			end
 		end
@@ -48,7 +48,7 @@ feature -- Basic operations
 				results.found_item.extend ([guard, res])
 			else
 				create list.make
-				list.extend ([guard, res])
+				list.put_front ([guard, res])
 				results.extend (list, state)
 			end
 		end
