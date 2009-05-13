@@ -1,5 +1,5 @@
 note
-	description: "Summary description for {GUI_MANAGER}."
+	description: "GUI manager react to user's actions."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -8,7 +8,7 @@ class
 	GUI_MANAGER
 
 inherit
-	ANY
+	AUTOMATED
 		redefine
 			default_create
 		end
@@ -32,7 +32,7 @@ feature -- Access
 		end
 
 
-	draw_units (units_list: LINKED_LIST [UNIT]) is
+	draw_units (units_list: LIST [UNIT]) is
 			-- Draws all units using `drawable_widget'
 			-- Implemented by iteration over units list `LINKED_LIST [UNITS]'
 		local
@@ -63,8 +63,6 @@ feature -- Access
 			cur := map_manager.position_at (mouse_x, mouse_y)
 			create x.make (press.x.min (cur.x), press.x.max (cur.x))
 			create y.make (press.y.min (cur.y), press.y.max (cur.y))
-
---			io.put_string ("[" + x.lower.out + ".." + x.upper.out + "]x[" + y.lower.out + ".." + y.upper.out + "]%N")
 
 			selected_units := unit_manager.select_units (x, y)
 			draw
@@ -152,6 +150,8 @@ feature {NONE} -- Implementation
 		do
 			if (button = 1 and is_selecting_mode) then
 				is_selecting_mode := False
+				mouse_x := x
+				mouse_y := y
 				draw_selected
 			end
 		end
@@ -162,7 +162,12 @@ feature {NONE} -- Implementation
 	mouse_y: INTEGER
 	is_selecting_mode: BOOLEAN
 
-	selected_units: LINKED_LIST [UNIT]
+	selected_units: LIST [UNIT]
+
+feature {NONE} -- Implementation: States
+	Select_: STATE is once create Result.make ("Select") end
+	Choose_action : STATE is once create Result.make ("Choose action") end
+
 invariant
 	unit_manager /= Void
 	map_manager /= Void

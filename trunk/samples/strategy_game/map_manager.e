@@ -1,5 +1,5 @@
 note
-	description: "This class manages map and positions on it"
+	description: "This class manages map and positions on it."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

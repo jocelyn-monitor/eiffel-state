@@ -1,5 +1,5 @@
 note
-	description: "Units that can be created by the player"
+	description: "Units that can be created by the players."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -54,6 +54,13 @@ feature -- Access
 			Result := True
 		end
 
+	actions: LIST [ACTION [TUPLE]]
+			-- Returns actions, which current unit can carry out.
+			-- TODO: make this STATE_DEPENDENT
+		deferred
+		ensure
+			Result /= Void
+		end
 
 feature -- Output
 	draw (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
@@ -106,13 +113,12 @@ feature -- Basic operations
 			health_state /= Void
 		end
 
-	improve_health: DOUBLE is
+	improve_health is
 			-- Improve health when unit is healed
 			-- and return time needed for this operation
 		do
 			sd_improve_health.call([], health_state)
 			health_state := sd_improve_health.next_state
-			Result := creation_time / 4
 		ensure
 			health_state /= Void
 		end
@@ -141,7 +147,8 @@ feature {NONE} -- Output
 												   {EV_FONT_CONSTANTS}.Shape_regular,
 												   8)
 			)
-			drawable.draw_text (x - size // 2, y + size // 2, type)
+			drawable.draw_text (x - size // 2, y + 2, type)
+			drawable.draw_ellipse (x - size // 2, y - size // 2, size, size)
 		ensure
 			drawable.font /= Void
 		end

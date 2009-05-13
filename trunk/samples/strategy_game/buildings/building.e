@@ -1,5 +1,5 @@
 note
-	description: "Deferred class for all buildings"
+	description: "Deferred class for all buildings."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"

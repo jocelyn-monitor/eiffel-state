@@ -9,10 +9,20 @@ deferred class
 
 inherit
 	UNIT
+    	redefine
+    		actions
+    	end
+
 
 feature -- Access
 	maximum_movement_speed: DOUBLE is
 		deferred
+		end
+
+	actions: LIST [ACTION [TUPLE]] is
+		do
+			Result := create {LINKED_LIST [ACTION [TUPLE]]}.make
+			Result.extend (create {ACTION [TUPLE [POSITION]]}.make (agent move, "move") )
 		end
 
 feature -- State dependent: Access
@@ -23,11 +33,10 @@ feature -- State dependent: Access
 		end
 
 feature -- Element change
-	move (new_position: POSITION): DOUBLE is
+	move (new_position: POSITION) is
 			-- Time which is taken by changing `position' to `new_position'
 		do
 			position := new_position
-			io.put_string (out + " has moved to " + new_position.out + "%N")
 		ensure
 			position_set: position.equals (new_position)
 		end

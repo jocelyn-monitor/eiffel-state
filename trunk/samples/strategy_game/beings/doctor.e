@@ -1,5 +1,5 @@
 note
-	description: "Doctor can heal other beings"
+	description: "Doctor can heal other beings."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -9,6 +9,9 @@ class
 
 inherit
 	BEING
+	   	redefine
+    		actions
+    	end
 
 create
 	make
@@ -21,12 +24,18 @@ feature -- Access
 
 	maximum_movement_speed: DOUBLE is 2.0
 
+	actions: LIST [ACTION [TUPLE]] is
+		do
+			Result := Precursor {BEING}
+			Result.extend (create {ACTION [TUPLE [BEING]]}.make (agent heal, "heal"))
+		end
+
 feature -- Basic operations
-	heal_being (b: BEING): DOUBLE is
+	heal (b: BEING) is
 			-- Heal some BEING
 		do
 			io.put_string (out + " is healing " + b.out + "%N")
-			Result := b.improve_health
+			b.improve_health
 		end
 
 end

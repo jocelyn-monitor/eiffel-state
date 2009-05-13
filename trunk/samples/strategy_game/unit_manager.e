@@ -1,5 +1,5 @@
 note
-	description: "This class manages all units in game"
+	description: "This class manages all units in game."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -17,7 +17,8 @@ feature -- Basic operations
 			hall: HALL
 			barrack: BARRACK
 			mine: MINE
-			sawmill: SAWMILL
+			storehouse: STOREHOUSE
+			buildings: LIST [BUILDING]
 
 			workers: ARRAY [WORKER]
 			worker: WORKER
@@ -28,17 +29,17 @@ feature -- Basic operations
 			resources: LINKED_LIST [RESOURCE]
 
 			i: INTEGER
+
+			list: LIST [ACTION [TUPLE]]
 		do
 			x_coordinate := 1
             create hall.make(map_manager.position (0, 0), "Red")
             process_unit (hall)
 
-			time := time + hall.train_hero
-            powerful_hero ?= hall.last_trained
+            powerful_hero := hall.train_hero
 			process_unit (powerful_hero)
 
-			time := time + hall.train_doctor
-            doctor ?= hall.last_trained
+            doctor := hall.train_doctor
 			process_unit (doctor)
 
             create workers.make (1, 3)
@@ -47,16 +48,17 @@ feature -- Basic operations
             until
                 i = workers.count + 1
             loop
-            	time := time + hall.train_worker
-            	worker ?= hall.last_trained
+            	worker := hall.train_worker
                 workers.put (worker, i)
                 process_unit (worker)
                 i := i + 1
             end
 
-			time := time + workers.item (1).build_barrack (map_manager.position (0, 1))
-            barrack := workers.item (1).last_barrack
-            process_unit (barrack)
+			buildings := create {LINKED_LIST [BUILDING]}.make
+			workers.item (1).build_barrack (map_manager.position (0, 1))
+			barrack ?= workers.item (1).last_building
+			buildings.extend (workers.item (1).last_building)
+            process_unit (workers.item (1).last_building)
 
             create soldiers.make (1, 5)
             from
@@ -64,35 +66,50 @@ feature -- Basic operations
             until
                 i = soldiers.count + 1
             loop
-            	time := time + barrack.train_soldier
-            	soldier := barrack.last_soldier
+            	soldier := barrack.train_soldier
                 soldiers.put (soldier, i)
+                list := soldier.actions
                 process_unit (soldier)
                 i := i + 1
             end
 
-			time := time + workers.item (2).build_mine (map_manager.position (0, 2))
-            mine := workers.item (2).last_mine
-            process_unit (mine)
+			workers.item (2).build_mine (map_manager.position (0, 2))
+			mine ?= workers.item (2).last_building
+			buildings.extend (workers.item (2).last_building)
+            process_unit (workers.item (2).last_building)
 
-			time := time + workers.item (3).build_sawmill (map_manager.position (0, 3))
-            sawmill := workers.item (3).last_sawmill
-            process_unit (sawmill)
+			workers.item (3).build_sawmill (map_manager.position (0, 3))
+			buildings.extend (workers.item (3).last_building)
+            process_unit (workers.item (3).last_building)
+
+           	workers.item (2).build_storehouse (map_manager.position (0, 4))
+			storehouse ?= workers.item (2).last_building
+			buildings.extend (workers.item (2).last_building)
+            process_unit (workers.item (2).last_building)
 
 			create resources.make
             from
                 i := 1
             until
-                i > 3
+                i = workers.count + 1
             loop
-            	time := time + workers.item (i).collect_gold (mine)
-                resources.extend (mine.last_gold)
+            	workers.item (i).collect_gold (mine)
+                resources.extend (workers.item (i).resource_in_knapsack)
                 i := i + 1
             end
 
-            time := time + powerful_hero.attack (workers.item (1))
+            from
+            	i := 1
+            until
+            	i = workers.count + 1
+            loop
+            	workers.item (i).move (map_manager.position (i + 1, 0))
+            	i := i + 1
+            end
 
-            time := time + doctor.heal_being (powerful_hero)
+            powerful_hero.attack (workers.item (1))
+
+            doctor.heal (powerful_hero)
 		end
 
 	process_unit (unit: UNIT) is
@@ -105,20 +122,20 @@ feature -- Basic operations
 			units.extend (unit)
 			being ?= unit
 			if (being /= Void) then
-				time := time + being.move (map_manager.position (x_coordinate, 0))
+				being.move (map_manager.position (x_coordinate, 0))
 				x_coordinate := x_coordinate + 1
 			end
 		end
 
 feature -- Access
-	units: LINKED_LIST [UNIT]
+	units: LIST [UNIT]
 			-- All units in game are stored in this list
 
-	select_units (x, y: INTEGER_INTERVAL): LINKED_LIST [UNIT] is
+	select_units (x, y: INTEGER_INTERVAL): LIST [UNIT] is
 			-- Select units in given rectangle,
 			-- return list containing all of them
 		do
-			create Result.make
+			Result := create {LINKED_LIST [UNIT]}.make
 			from
 				units.start
 			until
@@ -146,7 +163,7 @@ feature -- Initialization
 			map_manager_exists: m /= Void
 		do
 			map_manager := m
-			create units.make
+			units := create {LINKED_LIST [UNIT]}.make
 			execute_script
 		ensure
 			units_created: units.count > 0
@@ -160,11 +177,7 @@ feature {NONE} -- Implementation
 	x_coordinate: INTEGER
 			-- Current coordinate for unit in the row
 
-	time : DOUBLE
-			-- Time elapsed from the very beginning
-
 invariant
-	positive_time: time >= 0
 	units /= Void
 	positive_coordinate: x_coordinate > 0
 end
