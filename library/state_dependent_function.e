@@ -55,6 +55,8 @@ feature -- Basic operations
 
 	item (args: ARGS; state: STATE): RES is
 			-- Function result in `state' with `args' (default value if no specific behavior defined)
+		require
+			results.has (state) or behaviors.has (state) --check if function is defined in this state
 		local
 			found: BOOLEAN
 		do
@@ -65,10 +67,10 @@ feature -- Basic operations
 				until
 					results.found_item.after or found
 				loop
-					 if results.found_item.item.guard.item (args) then
-						 found := True
-						 Result := results.found_item.item.res
-					 end
+					if results.found_item.item.guard.item (args) then
+						found := True
+						Result := results.found_item.item.res
+					end
 					results.found_item.forth
 				end
 			end

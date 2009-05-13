@@ -42,6 +42,8 @@ feature -- Basic operations
 
 	call (args: ARGS; state: STATE) is
 			-- Call procedure in `state' with `args'
+		require
+			behaviors.has (state)
 		local
 			found: BOOLEAN
 		do
