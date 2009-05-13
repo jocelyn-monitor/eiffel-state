@@ -1,0 +1,20 @@
+#summary Recommended approach for inheritance of automated classes
+
+= Introduction =
+
+When extending an existing class you might want to add new feature (either state-dependent or state-independent) or to override existing feature (it can be state-dependent or state-independent as well).
+
+
+= State-independent features =
+
+You can add or override state-independent feature as if it was an ordinary class.
+
+
+= Adding state-dependent features =
+
+Here the process is the same as for adding state-dependent feature to a new class.
+
+
+= Overriding state-dependent features =
+
+tbd
