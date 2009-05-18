@@ -9,6 +9,8 @@ class
 
 inherit
 	AUTOMATED
+		rename
+			state as relief_state
 		redefine
 			out
 		end
@@ -27,11 +29,11 @@ feature -- Initialization
 		do
 			x := new_x
 			y := new_y
-			state := relief_state (relief_type)
+			relief_state := get_relief_state (relief_type)
 		ensure
 			x_set: x = new_x
 			y_set: y = new_y
-			state_set: state /= Void
+			state_set: relief_state /= Void
 		end
 
 feature -- Access
@@ -43,12 +45,12 @@ feature -- Access
 	relief_name (relief_type: INTEGER): STRING is
 			-- Returns name of relief corresponding to `relief_type' type
 		do
-			Result := relief_state(relief_type).name
+			Result := get_relief_state(relief_type).name
 		end
 
 	relief: STRING is
 		do
-			Result := state.name
+			Result := relief_state.name
 		end
 
 feature -- Status report
@@ -62,13 +64,13 @@ feature -- State dependent: Status report
 	crossing_time: INTEGER is
 			-- It takes `crossing_time' to cross cell with this coordinates according to its relief
 		do
-			Result := sd_crossing_time.item ([], state)
+			Result := sd_crossing_time.item ([], relief_state)
 		end
 
 	color: EV_COLOR is
 			-- Draws current cell, using its' relief
 		do
-			Result := sd_color.item ([], state)
+			Result := sd_color.item ([], relief_state)
 		end
 
 feature -- Output
@@ -112,7 +114,7 @@ feature {NONE} -- Implementation
 			end
 		end
 
-	relief_state (relief_type: INTEGER): STATE is
+	get_relief_state (relief_type: INTEGER): STATE is
 			-- Returns name of relief corresponding to `relief_type' type
 		do
 			Result := States @ relief_type
@@ -125,7 +127,7 @@ feature {NONE} -- Implementation
 				create {STATE}.make ("Field"),
 				create {STATE}.make ("Forest"),
 				create {STATE}.make ("Jungle"),
-				create {STATE}.make ("Water"),
+				create {STATE}.make ("Lake"),
 				create {STATE}.make ("Mountain")
 			>>
 		end
