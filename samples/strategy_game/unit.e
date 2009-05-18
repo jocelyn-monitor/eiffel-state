@@ -25,7 +25,7 @@ feature -- Initialization
 			team_name := team
 			create team_state.make(team)
 			health_state := Alive
-			selected_state := Nonselected
+			selection_state := Nonselected
 			position := p
 		ensure
 			position_set: position = p
@@ -69,7 +69,7 @@ feature -- Output
 			drawable_set: drawable /= Void
 			positive_size: size > 0
 		do
-			sd_draw.call ([x, y, size, drawable], selected_state)
+			sd_draw.call ([x, y, size, drawable], selection_state)
 		end
 
 	draw_nonselected (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
@@ -126,15 +126,15 @@ feature -- Basic operations
 	select_ is
 			-- Change unit's `selected_state' when unit was selected
 		do
-			sd_select.call ([], selected_state)
-			selected_state := sd_select.next_state
+			sd_select.call ([], selection_state)
+			selection_state := sd_select.next_state
 		end
 
 	deselect is
 			-- Change unit's `selected_state' when unit was deselected
 		do
-			sd_deselect.call ([], selected_state)
-			selected_state := sd_deselect.next_state
+			sd_deselect.call ([], selection_state)
+			selection_state := sd_deselect.next_state
 		end
 
 feature {NONE} -- Output
@@ -159,7 +159,7 @@ feature {NONE} -- States
 	Seriously_injured: STATE is once create Result.make ("Seriously injured") end
 	Dead: STATE is once create Result.make ("Dead") end
 
-	selected_state: STATE
+	selection_state: STATE
 			-- Is this unit selected in the game?
 	Selected: STATE is once create Result.make ("Selected") end
 	Nonselected: STATE is once create Result.make ("Nonselected") end
@@ -224,5 +224,5 @@ invariant
 	type_nonempty: not type.is_empty
 	health_state_exists: health_state /= Void
 	team_state_exists: team_state /= Void
-	selected_state_exists: selected_state /= Void
+	selected_state_exists: selection_state /= Void
 end

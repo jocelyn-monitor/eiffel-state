@@ -169,6 +169,20 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
+	busy is
+			-- Busy worker
+		do
+			sd_busy.call([], accessibility_state)
+			accessibility_state := sd_busy.next_state
+		end
+
+	free is
+			-- Frees worker
+		do
+			sd_free.call([], accessibility_state)
+			accessibility_state := sd_free.next_state
+		end
+
 feature -- Initialization
 	make (p: POSITION; team: STRING) is
 		do
@@ -187,6 +201,20 @@ feature {NONE} -- Implementation
 
 	Free: STATE is once create Result.make ("Free") end
 	Busy: STATE is once create Result.make ("Busy") end
+
+	sd_busy: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+			-- State dependent procedure which busies worker
+		once
+			create Result.make (1)
+			Result.add_behavior (Free, agent true_agent, agent do_nothing, Busy)
+		end
+
+	sd_free: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+			-- State dependent procedure which frees worker
+		once
+			create Result.make (1)
+			Result.add_behavior (Busy, agent true_agent, agent do_nothing, Free)
+		end
 
 	accessibility_state: STATE
 end
