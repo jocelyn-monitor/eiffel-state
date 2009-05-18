@@ -28,9 +28,9 @@
 			<file_rule>
 				<exclude>^/resources$</exclude>
 			</file_rule>
-			<cluster name="beings" location="d:\files\software\eiffelstudioprojects\eiffel\samples\strategy_game\beings\"/>
-			<cluster name="buildings" location="d:\files\software\eiffelstudioprojects\eiffel\samples\strategy_game\buildings\"/>
-			<cluster name="resources" location="d:\files\software\eiffelstudioprojects\eiffel\samples\strategy_game\resources\"/>
+			<cluster name="beings" location="beings\"/>
+			<cluster name="buildings" location="buildings\"/>
+			<cluster name="resources" location="resources\"/>
 		</cluster>
 	</target>
 </system>
