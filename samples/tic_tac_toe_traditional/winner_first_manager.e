@@ -17,20 +17,22 @@ feature -- Initialization
 	default_create is
 			-- Create a manager with first turn cross
 		do
-			first_turn := {GAME}.Circle_code
 		end
 
-feature -- State dependent: basic operations
+feature -- basic operations
 	start_new_game is
 			-- Start a new game
 		do
-			if current_game /= Void and then current_game.winner /= {GAME}.Empty_code then
-				first_turn := current_game.winner
-			elseif first_turn = {GAME}.Cross_code then
-				first_turn := {GAME}.Circle_code
+			if current_game /= Void then
+				if current_game.circle_won then
+					create current_game.make_first_circle
+				elseif current_game.cross_won then
+					create current_game.make_first_cross
+				else
+					create current_game.make_first_cross
+				end
 			else
-				first_turn := {GAME}.Cross_code
+				create current_game.make_first_cross
 			end
-			create current_game.make (first_turn)
 		end
 end
