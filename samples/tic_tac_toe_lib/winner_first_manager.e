@@ -27,20 +27,21 @@ feature -- State dependent: basic operations
 		do
 			create sd_start_new_game.make (4)
 			sd_start_new_game.add_behavior (First_turn_cross,
-				agent: BOOLEAN do Result := current_game /= Void and then current_game.circle_won end,
-				agent do create current_game.make_first_circle end,
-				First_turn_cross)
-			sd_start_new_game.add_behavior (First_turn_cross,
 				agent: BOOLEAN do Result := True end,
 				agent do create current_game.make_first_cross end,
 				First_turn_circle)
+			sd_start_new_game.add_behavior (First_turn_circle,
+				agent: BOOLEAN do Result := True end,
+				agent do create current_game.make_first_circle end,
+				First_turn_cross)
+			sd_start_new_game.add_behavior (First_turn_cross,
+				agent: BOOLEAN do Result := current_game /= Void and then current_game.circle_won end,
+				agent do create current_game.make_first_circle end,
+				First_turn_cross)
 			sd_start_new_game.add_behavior (First_turn_circle,
 				agent: BOOLEAN do Result := current_game /= Void and then current_game.cross_won end,
 				agent do create current_game.make_first_cross end,
 				First_turn_circle)
-			sd_start_new_game.add_behavior (First_turn_circle,
-				agent: BOOLEAN do Result := True end,
-				agent do create current_game.make_first_circle end,
-				First_turn_cross)
+
 		end
 end
