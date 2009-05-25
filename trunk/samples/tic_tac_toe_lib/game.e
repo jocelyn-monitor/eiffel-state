@@ -20,6 +20,7 @@ feature {NONE} -- Initialization
 		do
 			create_empty_field
 			build_sd_make_turn
+			build_sd_check_winning_combination
 			state := Cross_turn
 		ensure
 			field_empty: field.for_all (agent {FIELD_CELL}.is_empty)
@@ -30,6 +31,7 @@ feature {NONE} -- Initialization
 		do
 			create_empty_field
 			build_sd_make_turn
+			build_sd_check_winning_combination
 			state := Circle_turn
 		ensure
 			field_empty: field.for_all (agent {FIELD_CELL}.is_empty)
@@ -104,11 +106,13 @@ feature -- State dependent: basic operations
 		do
 			sd_make_turn.call ([i, j], state)
 			state := sd_make_turn.next_state
+			sd_check_winning_combination.call ([], state)
+			state := sd_check_winning_combination.next_state
 		end
 
 feature {NONE} -- Predicates
-	has_empty (i, j: INTEGER): BOOLEAN is
-			-- Will there be any empty cells left after (`i', `j') is set?
+	has_empty: BOOLEAN is
+			-- Is there empty cell?
 		local
 			k, l:INTEGER
 		do
@@ -122,133 +126,89 @@ feature {NONE} -- Predicates
 				until
 					l > Dimension or Result
 				loop
-					Result := not (k = i and l = j) and item (k, l).is_empty
+					Result := item (k, l).is_empty
 					l := l + 1
 				end
 				k := k + 1
 			end
 		end
 
-	has_horizontal_cross (i, j: INTEGER): BOOLEAN is
-			-- Will there be a winning combination for crosses on `i' horizontal with `j' set?
+	has_horizontal_cross : BOOLEAN is
+			-- Is there horizontal cross-winning combination?
 		local
 			k: INTEGER
 		do
 			from
-				Result := True
+				Result := False
 				k := 1
 			until
-				k > Dimension or not Result
+				k > Dimension or Result
 			loop
-				Result := (k /= j) implies item (i, k).is_cross
+				Result := item (1, k).is_cross and item(2, k).is_cross and item(3, k).is_cross
 				k := k + 1
 			end
 		end
 
-	has_horizontal_circle (i, j: INTEGER): BOOLEAN is
-			-- Will there be a winning combination for circles on `i' horizontal with `j' set?
+	has_horizontal_circle : BOOLEAN is
+			-- Is there horizontal circle-winning combination?
 		local
 			k: INTEGER
 		do
 			from
-				Result := True
+				Result := False
 				k := 1
 			until
-				k > Dimension or not Result
+				k > Dimension or Result
 			loop
-				Result := (k /= j) implies item (i, k).is_circle
+				Result := item (1, k).is_circle and item(2, k).is_circle and item(3, k).is_circle
 				k := k + 1
 			end
 		end
 
-	has_vertical_cross (i, j: INTEGER): BOOLEAN is
-			-- Will there be a winning combination for crosses on `j' vertical with `i' set?
+	has_vertical_cross : BOOLEAN is
+			-- Is there vertical cross-winning combination?
 		local
 			k: INTEGER
 		do
 			from
-				Result := True
+				Result := False
 				k := 1
 			until
-				k > Dimension or not Result
+				k > Dimension or Result
 			loop
-				Result := (k /= i) implies item (k, j).is_cross
+				Result := item (k, 1).is_cross and item(k, 2).is_cross and item(k, 3).is_cross
 				k := k + 1
 			end
 		end
 
-	has_vertical_circle (i, j: INTEGER): BOOLEAN is
-			-- Will there be a winning combination for circles on `j' vertical with `i' set?
+	has_vertical_circle : BOOLEAN is
+			-- Is there vertical circle-winning combination?
 		local
 			k: INTEGER
 		do
 			from
-				Result := True
+				Result := False
 				k := 1
 			until
-				k > Dimension or not Result
+				k > Dimension or Result
 			loop
-				Result := (k /= i) implies item (k, j).is_circle
+				Result := item (k, 1).is_circle and item(k, 2).is_circle and item(k, 3).is_circle
 				k := k + 1
 			end
 		end
 
-	has_diagonal_cross (i, j: INTEGER): BOOLEAN is
-			-- Will there be a winning combination for crosses on any diagonal with (`i', `j') set?
-		local
-			k: INTEGER
+	has_diagonal_cross : BOOLEAN is
+			-- Is there diagonal cross-winning combination?
 		do
-			if i = j then
-				from
-					Result := True
-					k := 1
-				until
-					k > Dimension or not Result
-				loop
-					Result := (k /= i) implies item (k, k).is_cross
-					k := k + 1
-				end
-			end
-			if not Result and i = Dimension + 1 - j then
-				from
-					Result := True
-					k := 1
-				until
-					k > Dimension or not Result
-				loop
-					Result := (k /= i) implies item (k, Dimension + 1 - k).is_cross
-					k := k + 1
-				end
-			end
+			Result := item (1, 1).is_cross and item(2, 2).is_cross and item(3, 3).is_cross
+			Result := Result or (item (1, 3).is_cross and item(2, 2).is_cross and item(3, 1).is_cross)
 		end
 
-	has_diagonal_circle (i, j: INTEGER): BOOLEAN is
-			-- Will there be a winning combination for circles on any diagonal with (`i', `j') set?
-		local
-			k: INTEGER
+	has_diagonal_circle : BOOLEAN is
+			-- Is there diagonal circle-winning combination?
 		do
-			if i = j then
-				from
-					Result := True
-					k := 1
-				until
-					k > Dimension or not Result
-				loop
-					Result := (k /= i) implies item (k, k).is_circle
-					k := k + 1
-				end
-			end
-			if not Result and i = Dimension + 1 - j then
-				from
-					Result := True
-					k := 1
-				until
-					k > Dimension or not Result
-				loop
-					Result := (k /= i) implies item (k, Dimension + 1 - k).is_circle
-					k := k + 1
-				end
-			end
+			Result := item (1, 1).is_circle and item(2, 2).is_circle and item(3, 3).is_circle
+			Result := Result or (item (1, 3).is_circle and item(2, 2).is_circle and item(3, 1).is_circle)
 		end
 
 feature {NONE} -- Automaton
@@ -261,57 +221,21 @@ feature {NONE} -- Automaton
 	sd_make_turn: STATE_DEPENDENT_PROCEDURE [TUPLE [INTEGER, INTEGER]]
 			-- State-dependent procedure for `make_turn'
 
+	sd_check_winning_combination: STATE_DEPENDENT_PROCEDURE [TUPLE]
+			-- State-dependent procedure for `check_winning_combination'. It checks if there is a winning combination after opponents move
+
 	build_sd_make_turn is
 			-- Build `sd_make_turn'
 		do
-			create sd_make_turn.make (6)
+			create sd_make_turn.make (2)
 			sd_make_turn.add_behavior (Cross_turn,
-				agent (i, j: INTEGER): BOOLEAN
-					do
-						Result := has_horizontal_cross (i, j) or has_vertical_cross (i, j) or has_diagonal_cross (i, j)
-					end,
-				agent (i, j: INTEGER)
-					do
-						item (i, j).put_cross
-					end,
-				Cross_win)
-			sd_make_turn.add_behavior (Cross_turn,
-				agent (i, j: INTEGER): BOOLEAN
-					do
-						Result := not has_empty (i, j)
-					end,
-				agent (i, j: INTEGER)
-					do
-						item (i, j).put_cross
-					end,
-				Draw)
-			sd_make_turn.add_behavior (Cross_turn,
-				agent (i, j: INTEGER): BOOLEAN do Result := True end,
+				agent (i, j: INTEGER): BOOLEAN do Result := True and has_empty end,
 				agent (i, j: INTEGER)
 					do
 						item (i, j).put_cross
 					end,
 				Circle_turn)
-			sd_make_turn.add_behavior (Circle_turn,
-				agent (i, j: INTEGER): BOOLEAN
-					do
-						Result := has_horizontal_circle (i, j) or has_vertical_circle (i, j) or has_diagonal_circle (i, j)
-					end,
-				agent (i, j: INTEGER)
-					do
-						item (i, j).put_circle
-					end,
-				Circle_win)
-			sd_make_turn.add_behavior (Circle_turn,
-				agent (i, j: INTEGER): BOOLEAN
-					do
-						Result := not has_empty (i, j)
-					end,
-				agent (i, j: INTEGER)
-					do
-						item (i, j).put_circle
-					end,
-				Draw)
+
 			sd_make_turn.add_behavior (Circle_turn,
 				agent (i, j: INTEGER): BOOLEAN do Result := True end,
 				agent (i, j: INTEGER)
@@ -320,6 +244,35 @@ feature {NONE} -- Automaton
 					end,
 				Cross_turn)
 		end
+
+	build_sd_check_winning_combination is
+			-- Build `_sd_check_winning_combination'
+		do
+			create sd_check_winning_combination.make (6)
+
+			sd_check_winning_combination.add_behavior (Cross_turn,
+				agent : BOOLEAN do Result := True end,
+				agent do end, Cross_turn)
+			sd_check_winning_combination.add_behavior (Circle_turn,
+				agent : BOOLEAN do Result := True end,
+				agent do end, Circle_turn)
+
+			sd_check_winning_combination.add_behavior (Cross_turn,
+				agent : BOOLEAN do Result := not has_empty end,
+				agent do end, Draw)
+			sd_check_winning_combination.add_behavior (Circle_turn,
+				agent : BOOLEAN do Result := not has_empty end,
+				agent do end, Draw)
+
+			sd_check_winning_combination.add_behavior (Cross_turn,
+				agent : BOOLEAN do Result := has_diagonal_circle or has_horizontal_circle or has_vertical_circle end,
+				agent do end, Circle_win)
+			sd_check_winning_combination.add_behavior (Circle_turn,
+				agent : BOOLEAN do Result := has_diagonal_cross or has_horizontal_cross or has_vertical_cross end,
+				agent do end, Cross_win)
+		end
+
+
 
 feature {NONE} -- Implementation
 	field: ARRAY2 [FIELD_CELL]
