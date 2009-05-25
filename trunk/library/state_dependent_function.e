@@ -30,7 +30,7 @@ feature -- Basic operations
 		do
 			behaviors.search (state)
 			if behaviors.found then
-				behaviors.found_item.extend ([guard, function])
+				behaviors.found_item.put_front ([guard, function])
 			else
 				create list.make
 				list.put_front ([guard, function])
