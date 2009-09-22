@@ -13,6 +13,13 @@ inherit
 			state as health_state
 		redefine
 			out
+		select
+			out,
+			default_create
+		end
+	ENVIRONMENT
+		rename
+			out as env_out
 		end
 
 feature -- Initialization
@@ -25,7 +32,7 @@ feature -- Initialization
 			team_name := team
 			create team_state.make(team)
 			health_state := Alive
-			selection_state := Nonselected
+			selected_state := Nonselected
 			position := p
 		ensure
 			position_set: position = p
@@ -48,12 +55,6 @@ feature -- Access
 		deferred
 		end
 
-	true_agent: BOOLEAN is
-			-- Function which returns true always
-		do
-			Result := True
-		end
-
 	actions: LIST [ACTION [TUPLE]]
 			-- Returns actions, which current unit can carry out.
 			-- TODO: make this STATE_DEPENDENT
@@ -63,31 +64,25 @@ feature -- Access
 		end
 
 feature -- Output
-	draw (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
-			-- Draw unit with (x, y) as its center position using `drawable'
-		require
-			drawable_set: drawable /= Void
-			positive_size: size > 0
+	draw is
+			-- Draw unit
 		do
-			sd_draw.call ([x, y, size, drawable], selection_state)
+			map_manager.draw_cell_at_position (position)
+			sd_draw.call ([gui_manager.drawable_widget], selected_state)
 		end
 
-	draw_nonselected (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
+	draw_nonselected (drawable: EV_DRAWABLE) is
 			-- Draw unit when it isn't selected
 		do
 			drawable.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 0))
-			common_draw (x, y, size, drawable)
-		ensure
-			color_set: drawable.foreground_color /= Void
+			common_draw
 		end
 
-	draw_selected (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
+	draw_selected (drawable: EV_DRAWABLE) is
 			-- Draw unit when it is selected
 		do
 			drawable.set_foreground_color (create {EV_COLOR}.make_with_rgb (1, 0, 0))
-			common_draw (x, y, size, drawable)
-		ensure
-			color_set: drawable.foreground_color /= Void
+			common_draw
 		end
 
 	out: STRING is
@@ -101,6 +96,12 @@ feature -- Status report
 			-- Does the unit have maximum amount of hit points?
 		do
 			Result := health_state = Alive
+		end
+
+	is_selected: BOOLEAN is
+			-- Is this unit selected by mouse?
+		do
+			Result := selected_state = Selected
 		end
 
 feature -- Basic operations
@@ -123,34 +124,36 @@ feature -- Basic operations
 			health_state /= Void
 		end
 
-	select_ is
-			-- Change unit's `selected_state' when unit was selected
+	change_selected_state is
+			-- Set unit's `selected_state' to `Selected' when unit wasn't selected and vice versa
 		do
-			sd_select.call ([], selection_state)
-			selection_state := sd_select.next_state
-		end
-
-	deselect is
-			-- Change unit's `selected_state' when unit was deselected
-		do
-			sd_deselect.call ([], selection_state)
-			selection_state := sd_deselect.next_state
+			sd_change_selected_state.call ([], selected_state)
+			selected_state := sd_change_selected_state.next_state
+			draw
 		end
 
 feature {NONE} -- Output
-	common_draw (x, y, size: INTEGER; drawable: EV_DRAWABLE) is
+	common_draw is
 			-- Draws text in the cell where unit is situated
+		local
+			drawable: EV_DRAWABLE
+			x, y, size: INTEGER
+			unit_coordinates: ARRAY [INTEGER]
+				-- Absolute coordinates got from `map_manager'
 		do
+			drawable := gui_manager.drawable_widget
 			drawable.set_font (
 				create {EV_FONT}.make_with_values ({EV_FONT_CONSTANTS}.Family_roman,
 												   {EV_FONT_CONSTANTS}.Weight_bold,
 												   {EV_FONT_CONSTANTS}.Shape_regular,
 												   8)
 			)
-			drawable.draw_text (x - size // 2, y + 2, type)
+			unit_coordinates := map_manager.cell_center_coordinates (position)
+			x := unit_coordinates @ 1
+			y := unit_coordinates @ 2
+			size := map_manager.cell_size
+			drawable.draw_text (x - size // 2 + 2, y + 2, type.substring (1, type.count.min (5)))
 			drawable.draw_ellipse (x - size // 2, y - size // 2, size, size)
-		ensure
-			drawable.font /= Void
 		end
 
 feature {NONE} -- States
@@ -159,7 +162,7 @@ feature {NONE} -- States
 	Seriously_injured: STATE is once create Result.make ("Seriously injured") end
 	Dead: STATE is once create Result.make ("Dead") end
 
-	selection_state: STATE
+	selected_state: STATE
 			-- Is this unit selected in the game?
 	Selected: STATE is once create Result.make ("Selected") end
 	Nonselected: STATE is once create Result.make ("Nonselected") end
@@ -183,39 +186,34 @@ feature {NONE} -- State dependent implementation
 			-- State dependent procedure which changes state when unit is under attack
 		once
 			create Result.make(3)
-			Result.add_behavior (Alive, agent: BOOLEAN do Result := True end, agent do end, Injured)
-			Result.add_behavior (Injured, agent: BOOLEAN do Result := True end, agent do end, Seriously_injured)
-			Result.add_behavior (Seriously_injured, agent: BOOLEAN do Result := True end, agent do end, Dead)
+			Result.add_behavior (Alive, agent true_agent, agent do end, Injured)
+			Result.add_behavior (Injured, agent true_agent, agent do end, Seriously_injured)
+			Result.add_behavior (Seriously_injured, agent true_agent, agent do end, Dead)
 		end
 
 	sd_draw: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- Draws unit according to his `selected_state'
 		do
 			create Result.make (2)
-			Result.add_behavior (Selected, agent: BOOLEAN do Result := True end, agent draw_selected, Selected)
-			Result.add_behavior (Nonselected, agent: BOOLEAN do Result := True end, agent draw_nonselected, Nonselected)
+			Result.add_behavior (Selected, agent true_agent, agent draw_selected, Selected)
+			Result.add_behavior (Nonselected, agent true_agent, agent draw_nonselected, Nonselected)
 		end
 
-	sd_select: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+	sd_change_selected_state: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 		once
-			create Result.make (1)
-			Result.add_behavior (Nonselected, agent: BOOLEAN do Result := True end, agent do end, Selected)
-		end
-
-	sd_deselect: STATE_DEPENDENT_PROCEDURE [TUPLE] is
-		once
-			create Result.make (1)
-			Result.add_behavior (Selected, agent: BOOLEAN do Result := True end, agent do end, Nonselected)
+			create Result.make (2)
+			Result.add_behavior (Nonselected, agent true_agent, agent do end, Selected)
+			Result.add_behavior (Selected, agent true_agent, agent do end, Nonselected)
 		end
 
 	sd_ability_reduction: STATE_DEPENDENT_FUNCTION [TUPLE, DOUBLE] is
 			-- State-dependent function which changes abilities of beings: movement speed, attack accuracy
 		once
 			create Result.make(4)
-			Result.add_result (Alive, agent: BOOLEAN do Result := True end, 1.0)
-			Result.add_result (Injured, agent: BOOLEAN do Result := True end, 0.7)
-			Result.add_result (Seriously_injured, agent: BOOLEAN do Result := True end, 0.3)
-			Result.add_result (Dead, agent: BOOLEAN do Result := True end, 0.0)
+			Result.add_result (Alive, agent true_agent, 1.0)
+			Result.add_result (Injured, agent true_agent, 0.7)
+			Result.add_result (Seriously_injured, agent true_agent, 0.3)
+			Result.add_result (Dead, agent true_agent, 0.0)
 		end
 
 invariant
@@ -224,5 +222,5 @@ invariant
 	type_nonempty: not type.is_empty
 	health_state_exists: health_state /= Void
 	team_state_exists: team_state /= Void
-	selected_state_exists: selection_state /= Void
+	selected_state_exists: selected_state /= Void
 end

@@ -7,10 +7,52 @@ note
 class
 	UNIT_MANAGER
 
-create
-	make
+inherit
+	ENVIRONMENT
 
-feature -- Basic operations
+create
+	default_create
+
+feature -- Access
+	units: LIST [UNIT]
+			-- All units in game are stored in this list
+
+	select_units (x, y: INTEGER_INTERVAL): LINKED_LIST [UNIT] is
+			-- Select units in given rectangle,
+			-- return list containing all of them
+		do
+			Result := create {LINKED_LIST [UNIT]}.make
+			from
+				units.start
+			until
+				units.after
+			loop
+				if (x.has (units.item.position.x) and y.has (units.item.position.y)) then
+					Result.extend (units.item)
+				end
+				if ((x.has (units.item.position.x) and y.has (units.item.position.y)) xor units.item.is_selected) then
+					units.item.change_selected_state
+				end
+				units.forth
+					-- Iterate over all units
+			end
+		end
+
+
+feature -- Initialization
+	default_create is
+			-- and execute list of actions
+		do
+			units := create {LINKED_LIST [UNIT]}.make
+			execute_script
+		ensure then
+			units_created: units.count > 0
+		end
+
+feature {NONE} -- Implementation
+	x_coordinate: INTEGER
+			-- Current coordinate for unit in the row
+
 	execute_script is
 			-- Creation of several units as an example of manager's job
 		local
@@ -126,56 +168,6 @@ feature -- Basic operations
 				x_coordinate := x_coordinate + 1
 			end
 		end
-
-feature -- Access
-	units: LIST [UNIT]
-			-- All units in game are stored in this list
-
-	select_units (x, y: INTEGER_INTERVAL): LIST [UNIT] is
-			-- Select units in given rectangle,
-			-- return list containing all of them
-		do
-			Result := create {LINKED_LIST [UNIT]}.make
-			from
-				units.start
-			until
-				units.after
-			loop
-				if (x.has (units.item.position.x) and y.has (units.item.position.y)) then
-					units.item.select_
---					io.put_string (units.item.out + " ")
-					Result.extend (units.item)
-				else
-					units.item.deselect
-				end
-				units.forth
-					-- Iterate over all units
-			end
---			io.put_new_line
-		end
-
-
-feature -- Initialization
-	make (m: MAP_MANAGER) is
-			-- Memorize pointer to `MAP_MANAGER' object
-			-- and execute list of actions
-		require
-			map_manager_exists: m /= Void
-		do
-			map_manager := m
-			units := create {LINKED_LIST [UNIT]}.make
-			execute_script
-		ensure
-			units_created: units.count > 0
-		end
-
-feature {NONE} -- Implementation
-
-	map_manager: MAP_MANAGER
-			-- Pointer to map manager of the game
-
-	x_coordinate: INTEGER
-			-- Current coordinate for unit in the row
 
 invariant
 	units /= Void
