@@ -8,21 +8,29 @@ class
 
 inherit
 	EV_APPLICATION
+		select
+			default_create,
+			copy
+		end
+	ENVIRONMENT
+		rename
+			copy as env_copy
+		end
 
 create
 	make_and_launch
 
 feature {NONE} -- Initialization
-
 	make_and_launch is
 			-- Initialize and launch application
 		do
 			default_create
-			create gui_manager
+			gui := gui_manager
+			gui.show_window
 			launch
 		end
 
 feature {NONE} -- Implementation
-	gui_manager: GUI_MANAGER
+	gui: GUI_MANAGER
 
 end

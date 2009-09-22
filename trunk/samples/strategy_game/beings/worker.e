@@ -50,7 +50,7 @@ feature -- Basic operations
 			b_exists: b /= Void
 			worker_is_free: is_free
 		do
-			accessibility_state := Busy
+			busy
 			move (b.position)
 			from
 			until
@@ -59,7 +59,7 @@ feature -- Basic operations
 				b.repair
 			end
 			io.put_string (out + " has repaired building%N")
-			accessibility_state := Free
+			free
 		ensure
 			is_repaired: b.is_repaired
 			worker_is_free: is_free
@@ -70,11 +70,11 @@ feature -- Basic operations
 		require
 			p_exists: p /= Void
 		do
-			accessibility_state := Busy
+			busy
 			move (p)
 			last_building := create {MINE}.make (p, team_name)
 			io.put_string (last_building.out + " was just constructed%N")
-			accessibility_state := Free
+			free
 		ensure
 			worker_is_free: is_free
 		end
@@ -84,11 +84,11 @@ feature -- Basic operations
 		require
 			p_exists: p /= Void
 		do
-			accessibility_state := Busy
+			busy
 			move (p)
 			last_building := create {SAWMILL}.make (p, team_name)
 			io.put_string (last_building.out + " was just constructed%N")
-			accessibility_state := Free
+			free
 		ensure
 			worker_is_free: is_free
 		end
@@ -98,11 +98,11 @@ feature -- Basic operations
 		require
 			p_exists: p /= Void
 		do
-			accessibility_state := Busy
+			busy
 			move (p)
 			last_building := create {STOREHOUSE}.make (p, team_name)
 			io.put_string (last_building.out + " was just constructed%N")
-			accessibility_state := Free
+			free
 		ensure
 			worker_is_free: is_free
 		end
@@ -112,11 +112,11 @@ feature -- Basic operations
 		require
 			p_exists: p /= Void
 		do
-			accessibility_state := Busy
+			busy
 			move (p)
 			last_building := create {BARRACK}.make (p, team_name)
 			io.put_string (last_building.out + " was just constructed%N")
-			accessibility_state := Free
+			free
 		ensure
 			worker_is_free: is_free
 		end
@@ -126,11 +126,11 @@ feature -- Basic operations
 		require
 			p_exists: p /= Void
 		do
-			accessibility_state := Busy
+			busy
 			move (p)
 			last_building := create {HALL}.make (p, team_name)
 			io.put_string (last_building.out + " was just constructed%N")
-			accessibility_state := Free
+			free
 		ensure
 			worker_is_free: is_free
 		end
@@ -141,7 +141,7 @@ feature -- Basic operations
 			position_exists: position /= Void
 			sawmill_exists: sawmill /= Void
 		do
-			accessibility_state := Busy
+			busy
 			move (tree_position)
 			resource_in_knapsack := create {FELLED_TREE}
 			io.put_string (out + " has just cut a tree at " + tree_position.out + "%N")
@@ -149,7 +149,7 @@ feature -- Basic operations
 			move (sawmill.position)
 			resource_in_knapsack := sawmill.produce
 			io.put_string (out + " collected lumber%N")
-			accessibility_state := Free
+			free
 		ensure
 			worker_is_free: is_free
 		end
@@ -159,12 +159,12 @@ feature -- Basic operations
 		require
 			mine_exists: mine /= Void
 		do
-			accessibility_state := Busy
+			busy
 			move (mine.position)
 			io.put_string (out + " is searching for gold in " + mine.out + "%N")
 			resource_in_knapsack := mine.produce
 			io.put_string (out + " collected gold in " + mine.out + "%N")
-			accessibility_state := Free
+			free
 		ensure
 			worker_is_free: is_free
 		end
@@ -187,33 +187,33 @@ feature -- Initialization
 	make (p: POSITION; team: STRING) is
 		do
 			Precursor {BEING} (p, team)
-			accessibility_state := Free
+			accessibility_state := Free_
 		end
 
 feature -- State dependent: Access
 	is_free: BOOLEAN is
 			-- Is worker free
 		do
-			Result := accessibility_state = Free
+			Result := accessibility_state = Free_
 		end
 
 feature {NONE} -- Implementation
 
-	Free: STATE is once create Result.make ("Free") end
-	Busy: STATE is once create Result.make ("Busy") end
+	Free_: STATE is once create Result.make ("Free") end
+	Busy_: STATE is once create Result.make ("Busy") end
 
 	sd_busy: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- State dependent procedure which busies worker
 		once
 			create Result.make (1)
-			Result.add_behavior (Free, agent true_agent, agent do_nothing, Busy)
+			Result.add_behavior (Free_, agent true_agent, agent do_nothing, Busy_)
 		end
 
 	sd_free: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- State dependent procedure which frees worker
 		once
 			create Result.make (1)
-			Result.add_behavior (Busy, agent true_agent, agent do_nothing, Free)
+			Result.add_behavior (Busy_, agent true_agent, agent do_nothing, Free_)
 		end
 
 	accessibility_state: STATE

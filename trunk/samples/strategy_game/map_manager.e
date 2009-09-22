@@ -8,10 +8,7 @@ class
 	MAP_MANAGER
 
 inherit
-	ANY
-		redefine
-			default_create
-		end
+	ENVIRONMENT
 
 create
 	default_create
@@ -79,10 +76,9 @@ feature -- Access
 		end
 
 feature -- Basic operations
-	draw_map_rect_part (drawable: EV_DRAWABLE; x, y: INTEGER_INTERVAL) is
+	draw_map_rect_part (x, y: INTEGER_INTERVAL) is
 			-- Draws rectangle part of the map in the window using `drawable'
 		local
-			color: EV_COLOR
 			i, j: INTEGER
 		do
 			from
@@ -91,9 +87,7 @@ feature -- Basic operations
 			until
 				i = x.upper + 1
 			loop
-				color := position (i, j).color
-				drawable.set_foreground_color (color)
-				drawable.fill_rectangle (i * Cell_size, j * Cell_size, Cell_size, Cell_size)
+				draw_cell (i, j)
 				j := j + 1
 				if (j = y.upper + 1) then
 					j := y.lower
@@ -102,10 +96,27 @@ feature -- Basic operations
 			end
 		end
 
-	draw_map (drawable: EV_DRAWABLE) is
-			-- Draws the map in the window using `drawable'
+	draw_cell_at_position (p: POSITION) is
 		do
-			draw_map_rect_part (drawable, create {INTEGER_INTERVAL}.make (0, width - 1), create {INTEGER_INTERVAL}.make (0, height - 1))
+			draw_cell (p.x, p.y)
+		end
+
+
+	draw_cell (x, y: INTEGER) is
+			-- Draws one given cell
+		local
+			color: EV_COLOR
+		do
+			color := position (x, y).color
+			gui_manager.drawable_widget.set_foreground_color (color)
+			gui_manager.drawable_widget.fill_rectangle (x * Cell_size, y * Cell_size, Cell_size, Cell_size)
+		end
+
+
+	draw_map is
+			-- Draws the whole map
+		do
+			draw_map_rect_part (create {INTEGER_INTERVAL}.make (0, width - 1), create {INTEGER_INTERVAL}.make (0, height - 1))
 		end
 
 	set_game_map (index: INTEGER) is
