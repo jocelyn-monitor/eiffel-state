@@ -41,6 +41,7 @@ feature {NONE} -- Initialization
 			drawable_widget.pointer_button_press_actions.extend (agent widget_button_press)
 			drawable_widget.pointer_motion_actions.extend (agent widget_motion)
 			drawable_widget.pointer_button_release_actions.extend (agent widget_button_release)
+			drawable_widget.expose_actions.extend (agent draw_again)
 			is_selecting_mode := False
 
 			map_index := (create {TIME}.make_now).compact_time \\ map_manager.maps_number + 1
@@ -50,8 +51,7 @@ feature {NONE} -- Initialization
 			create main_window.make (
 				map_manager.width * map_manager.Cell_size + horizontal_border_thickness,
 				map_manager.height * map_manager.Cell_size + vertical_border_thickness,
-				drawable_widget,
-				agent draw
+				drawable_widget
 			)
 
 			user_state := Watching
@@ -63,7 +63,13 @@ feature {NONE} -- Implementation
 			-- Draws map and units on it
 		do
 			map_manager.draw_map
-			draw_units (unit_manager.units)
+			draw_units
+		end
+
+	draw_again (arg1, arg2, arg3, arg4: INTEGER) is
+			-- Calls `draw' function
+		do
+			draw
 		end
 
 --	draw_rect_part (x, y: INTEGER_INTERVAL) is
@@ -74,17 +80,17 @@ feature {NONE} -- Implementation
 --		end
 
 
-	draw_units (units_list: LIST [UNIT]) is
+	draw_units is
 			-- Draws all units using `drawable_widget'
 			-- Implemented by iteration over units list `LINKED_LIST [UNITS]'
 		do
 			from
-				units_list.start
+				unit_manager.units.start
 			until
-				units_list.after
+				unit_manager.units.after
 			loop
-				units_list.item.draw
-				units_list.forth
+				unit_manager.units.item.draw
+				unit_manager.units.forth
 			end
 		end
 
