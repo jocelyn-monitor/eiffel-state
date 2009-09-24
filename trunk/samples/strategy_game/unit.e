@@ -68,20 +68,20 @@ feature -- Output
 			-- Draw unit
 		do
 			map_manager.draw_cell_at_position (position)
-			sd_draw.call ([gui_manager.drawable_widget], selected_state)
+			sd_draw.call ([], selected_state)
 		end
 
-	draw_nonselected (drawable: EV_DRAWABLE) is
+	draw_nonselected is
 			-- Draw unit when it isn't selected
 		do
-			drawable.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 0))
+			gui_manager.drawable_widget.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 0))
 			common_draw
 		end
 
-	draw_selected (drawable: EV_DRAWABLE) is
+	draw_selected is
 			-- Draw unit when it is selected
 		do
-			drawable.set_foreground_color (create {EV_COLOR}.make_with_rgb (1, 0, 0))
+			gui_manager.drawable_widget.set_foreground_color (create {EV_COLOR}.make_with_rgb (1, 0, 0))
 			common_draw
 		end
 
@@ -136,13 +136,11 @@ feature {NONE} -- Output
 	common_draw is
 			-- Draws text in the cell where unit is situated
 		local
-			drawable: EV_DRAWABLE
 			x, y, size: INTEGER
 			unit_coordinates: ARRAY [INTEGER]
 				-- Absolute coordinates got from `map_manager'
 		do
-			drawable := gui_manager.drawable_widget
-			drawable.set_font (
+			gui_manager.drawable_widget.set_font (
 				create {EV_FONT}.make_with_values ({EV_FONT_CONSTANTS}.Family_roman,
 												   {EV_FONT_CONSTANTS}.Weight_bold,
 												   {EV_FONT_CONSTANTS}.Shape_regular,
@@ -152,8 +150,8 @@ feature {NONE} -- Output
 			x := unit_coordinates @ 1
 			y := unit_coordinates @ 2
 			size := map_manager.cell_size
-			drawable.draw_text (x - size // 2 + 2, y + 2, type.substring (1, type.count.min (5)))
-			drawable.draw_ellipse (x - size // 2, y - size // 2, size, size)
+			gui_manager.drawable_widget.draw_text (x - size // 2 + 2, y + 2, type.substring (1, type.count.min (5)))
+			gui_manager.drawable_widget.draw_ellipse (x - size // 2, y - size // 2, size, size)
 		end
 
 feature {NONE} -- States
