@@ -17,10 +17,10 @@ feature -- Access
 	Cell_size: INTEGER
 			-- Size of every relief cell
 
-	width: INTEGER
+	width: INTEGER is 20
 		-- Width of `current_game_map'
 
-	height: INTEGER
+	height: INTEGER is 20
 		-- Height of `current_game_map'
 
 	maps_number: INTEGER is
@@ -125,8 +125,6 @@ feature -- Basic operations
 			proper_index: index >= 1 and index <= maps_number
 		do
 			current_game_map := maps @ index
-			width := current_game_map.width
-			height := current_game_map.height
 		ensure
 			current_game_map /= Void
 		end
@@ -137,9 +135,10 @@ feature {NONE} -- Initialization
 			-- Initialize map relief
 		do
 			Cell_size := 30
-			create maps.make (1, 2)
+			create maps.make (1, 3)
 			maps.put (create {MAP}.create_random (1), 1)
 			maps.put (create {MAP}.create_random (2), 2)
+			maps.put (create {MAP}.choose_prepared, 3)
 		end
 
 feature {NONE} -- Implementation
