@@ -19,12 +19,11 @@ create
 
 feature {NONE} -- Initialization
 
-	make (w, h: INTEGER; widget: EV_WIDGET; draw_agent: PROCEDURE[ANY, TUPLE]) is
+	make (w, h: INTEGER; widget: EV_WIDGET;) is
 		do
 			main_widget := widget
 			Window_width := w
 			Window_height := h
-			draw_procedure := draw_agent
 			default_create
 		end
 
@@ -91,8 +90,6 @@ feature {NONE} -- Implementation
 		end
 
 	main_widget: EV_WIDGET
-
-	draw_procedure: PROCEDURE [ANY, TUPLE]
 
 feature {NONE} -- Implementation / Constants
 
