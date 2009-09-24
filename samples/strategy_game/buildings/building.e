@@ -13,4 +13,5 @@ inherit
 			is_healthy as is_repaired,
 			improve_health as repair
 		end
+
 end

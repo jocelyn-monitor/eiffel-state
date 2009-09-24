@@ -29,9 +29,8 @@ feature -- Access
 
 	actions: LIST [ACTION [TUPLE]] is
 		do
-			Result := Void
+			Result := create {LINKED_LIST [ACTION [TUPLE]]}.make
 		end
-
 
 feature -- Basic operations
 	deliver (resource: RESOURCE) is

@@ -13,4 +13,6 @@ inherit
 feature -- Access
 	creation_time: DOUBLE is 1.0
 
+	type: STRING is "felled tree"
+
 end

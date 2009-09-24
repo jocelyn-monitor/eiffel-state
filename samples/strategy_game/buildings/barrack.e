@@ -20,14 +20,17 @@ feature -- Access
 
 	actions: LIST [ACTION [TUPLE]] is
 		do
-			Result := Void
+			Result := create {LINKED_LIST [ACTION [TUPLE]]}.make
+			Result.extend (create {ACTION [TUPLE]}.make (agent train_soldier, "train soldier"))
 		end
 
+	last_trained_soldier: SOLDIER
+
 feature -- Basic operations
-	train_soldier: SOLDIER is
+	train_soldier is
 		do
-			create Result.make (position, team_name)
-			io.put_string (Result.out + " was trained%N")
+			create last_trained_soldier.make (position, team_name)
+			io.put_string (last_trained_soldier.out + " was trained%N")
 		end
 
 end
