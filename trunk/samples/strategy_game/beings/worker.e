@@ -169,6 +169,18 @@ feature -- Basic operations
 			worker_is_free: is_free
 		end
 
+	store_resource (storehouse: STOREHOUSE) is
+		require
+			storehouse_exists: storehouse /= Void
+		do
+			busy
+			move (storehouse.position)
+			storehouse.deliver (resource_in_knapsack)
+			io.put_string (out + " stored " + resource_in_knapsack.out + "in " + storehouse.out + "%N")
+			free
+		end
+
+
 	busy is
 			-- Busy worker
 		do

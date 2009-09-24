@@ -21,25 +21,51 @@ feature -- Access
 
 	actions: LIST [ACTION [TUPLE]] is
 		do
-			Result := Void
+			Result := create {LINKED_LIST [ACTION [TUPLE]]}.make
+			Result.extend (create {ACTION [TUPLE]}.make (agent train_worker, "train worker"))
+			Result.extend (create {ACTION [TUPLE]}.make (agent train_hero, "train hero"))
+			Result.extend (create {ACTION [TUPLE]}.make (agent train_doctor, "train doctor"))
 		end
+
+	last_trained_being: BEING
 
 feature -- Basic operations
-	train_worker: WORKER is
+	train_worker is
 			-- Train worker
+		local
+			worker: WORKER
 		do
-			create Result.make (position, team_name)
+			create worker.make (position, team_name)
+--			unit_manager.add_unit (worker)
+			last_trained_being := worker
+			worker.draw
+		ensure
+			worker_created: last_trained_being /= Void
 		end
 
-	train_hero: HERO is
+	train_hero is
 			-- Train hero
+		local
+			hero: HERO
 		do
-			create Result.make (position, team_name)
+			create hero.make (position, team_name)
+--			unit_manager.add_unit (hero)
+			last_trained_being := hero
+			hero.draw
+		ensure
+			hero_created: last_trained_being /= Void
 		end
 
-	train_doctor: DOCTOR is
+	train_doctor is
 			-- Train doctor
+		local
+			doc: DOCTOR
 		do
-			create Result.make (position, team_name)
+			create doc.make (position, team_name)
+--			unit_manager.add_unit (doc)
+			last_trained_being := doc
+			doc.draw
+		ensure
+			doc_created: last_trained_being /= Void
 		end
 end

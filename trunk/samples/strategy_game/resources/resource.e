@@ -9,9 +9,14 @@ deferred class
 
 feature -- Access
 
-creation_time: DOUBLE is
-		-- Time required to produce resource
-	deferred
-	end
+	creation_time: DOUBLE is
+			-- Time required to produce resource
+		deferred
+		end
+
+	type: STRING is
+			-- Type of resource
+		deferred
+		end
 
 end

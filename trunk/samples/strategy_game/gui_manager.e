@@ -71,12 +71,12 @@ feature {NONE} -- Implementation
 			-- Implemented by iteration over units list `LINKED_LIST [UNITS]'
 		do
 			from
-				unit_manager.units.start
+				unit_manager.all_units.start
 			until
-				unit_manager.units.after
+				unit_manager.all_units.after
 			loop
-				unit_manager.units.item.draw
-				unit_manager.units.forth
+				unit_manager.all_units.item.draw
+				unit_manager.all_units.forth
 			end
 		end
 
@@ -139,6 +139,8 @@ feature {NONE} -- Implementation
 			if (user_state = Watching) then
 				user_state := Started_selecting_units
 				save_mouse_coordinates (x, y)
+				mouse_press_x := x
+				mouse_press_y := y
 				draw
 				user_state := Selecting_units
 			elseif (user_state = Choosing_action) then
@@ -157,12 +159,24 @@ feature {NONE} -- Implementation
 
 	widget_button_release (x, y, button: INTEGER; x_tilt, y_tilt, pressure: DOUBLE; screen_x, screen_y: INTEGER) is
 			-- A pointer button release event has occurred on the test widget
+		local
+			actions: LINEAR [STRING]
 		do
 			if (user_state = Selecting_units) then
 				user_state := Finished_selecting_units
 				save_mouse_coordinates (x, y)
 				draw
 --				user_state := Choosing_action
+				from
+					actions := unit_manager.available_actions (selected_units)
+					actions.start
+				until
+					actions.after
+				loop
+					io.put_string (actions.item)
+					io.put_new_line
+					actions.forth
+				end
 				user_state := Watching
 			end
 		end
@@ -175,7 +189,6 @@ feature {NONE} -- Implementation
 			mouse_y := y
 		end
 
-
 	mouse_press_x: INTEGER
 	mouse_press_y: INTEGER
 	mouse_x: INTEGER
@@ -183,7 +196,7 @@ feature {NONE} -- Implementation
 	prev_mouse_x: INTEGER
 	prev_mouse_y: INTEGER
 
-	selected_units: LIST [UNIT]
+	selected_units: LINEAR [UNIT]
 
 feature {NONE} -- Implementation: States
 	Watching: STATE is once create Result.make ("Watching") end

@@ -14,21 +14,36 @@ create
 	default_create
 
 feature -- Access
-	units: LIST [UNIT]
-			-- All units in game are stored in this list
+	add_unit (unit: UNIT) is
+			-- Let unit manager know about new unit
+		do
+			units.extend (unit)
+		end
 
-	select_units (x, y: INTEGER_INTERVAL): LINKED_LIST [UNIT] is
+	all_units: LINEAR [UNIT] is
+			-- Returns all units in `LINEAR', which allows only reading
+		do
+			Result := units
+		end
+
+
+	select_units (x, y: INTEGER_INTERVAL): LINEAR [UNIT] is
 			-- Select units in given rectangle,
 			-- return list containing all of them
+		local
+			list: LINKED_LIST [UNIT]
 		do
-			Result := create {LINKED_LIST [UNIT]}.make
+			create list.make
 			from
 				units.start
 			until
 				units.after
 			loop
 				if (x.has (units.item.position.x) and y.has (units.item.position.y)) then
-					Result.extend (units.item)
+--					io.put_string ("unit=" + units.item.out)
+--					io.put_string (", pos=" + units.item.position.out)
+--					io.put_new_line
+					list.extend (units.item)
 				end
 				if ((x.has (units.item.position.x) and y.has (units.item.position.y)) xor units.item.is_selected) then
 					units.item.change_selected_state
@@ -36,24 +51,44 @@ feature -- Access
 				units.forth
 					-- Iterate over all units
 			end
+			Result := list
 		end
 
+	available_actions (list: LINEAR [UNIT]): LINEAR [STRING] is
+			-- Returns actions which can be completed for given list of units
+		local
+			set: BINARY_SEARCH_TREE_SET [STRING]
+			actions_list: LIST [ACTION [TUPLE]]
+		do
+			create set.make
+			from
+				list.start
+			until
+				list.after
+			loop
+				actions_list := list.item.actions
+				from
+					actions_list.start
+				until
+					actions_list.after
+				loop
+					set.extend (actions_list.item.out)
+					actions_list.forth
+				end
+				list.forth
+			end
+			Result := set
+		end
 
 feature -- Initialization
 	default_create is
 			-- and execute list of actions
 		do
 			units := create {LINKED_LIST [UNIT]}.make
-			execute_script
-		ensure then
-			units_created: units.count > 0
 		end
 
-feature {NONE} -- Implementation
-	x_coordinate: INTEGER
-			-- Current coordinate for unit in the row
-
-	execute_script is
+feature -- Operations
+	sample_units_script is
 			-- Creation of several units as an example of manager's job
 		local
 			hall: HALL
@@ -78,10 +113,13 @@ feature {NONE} -- Implementation
             create hall.make(map_manager.position (0, 0), "Red")
             process_unit (hall)
 
-            powerful_hero := hall.train_hero
+			hall.train_hero
+            powerful_hero ?= hall.last_trained_being
 			process_unit (powerful_hero)
 
-            doctor := hall.train_doctor
+
+			hall.train_doctor
+            doctor ?= hall.last_trained_being
 			process_unit (doctor)
 
             create workers.make (1, 3)
@@ -90,7 +128,8 @@ feature {NONE} -- Implementation
             until
                 i = workers.count + 1
             loop
-            	worker := hall.train_worker
+            	hall.train_worker
+            	worker ?= hall.last_trained_being
                 workers.put (worker, i)
                 process_unit (worker)
                 i := i + 1
@@ -108,7 +147,8 @@ feature {NONE} -- Implementation
             until
                 i = soldiers.count + 1
             loop
-            	soldier := barrack.train_soldier
+            	barrack.train_soldier
+            	soldier := barrack.last_trained_soldier
                 soldiers.put (soldier, i)
                 list := soldier.actions
                 process_unit (soldier)
@@ -152,7 +192,14 @@ feature {NONE} -- Implementation
             powerful_hero.attack (workers.item (1))
 
             doctor.heal (powerful_hero)
+		ensure
+			units_created: units.count > 0
 		end
+
+feature {NONE} -- Implementation
+
+	x_coordinate: INTEGER
+			-- Current coordinate for unit in the row
 
 	process_unit (unit: UNIT) is
 			-- Adds `unit' in `units' list and moves it to the next position in the row.
@@ -161,7 +208,7 @@ feature {NONE} -- Implementation
 			being: BEING
 				-- if `unit' is `BEING' then it can be moved
 		do
-			units.extend (unit)
+			add_unit (unit)
 			being ?= unit
 			if (being /= Void) then
 				being.move (map_manager.position (x_coordinate, 0))
@@ -169,7 +216,9 @@ feature {NONE} -- Implementation
 			end
 		end
 
+	units: LIST [UNIT]
+			-- All units in game are stored in this list
+
 invariant
 	units /= Void
-	positive_coordinate: x_coordinate > 0
 end

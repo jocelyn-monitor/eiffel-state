@@ -13,4 +13,6 @@ inherit
 feature -- Access
 	creation_time: DOUBLE is 3.0
 
+	type: STRING is "gold"
+
 end

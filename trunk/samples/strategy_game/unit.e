@@ -56,7 +56,7 @@ feature -- Access
 		end
 
 	actions: LIST [ACTION [TUPLE]]
-			-- Returns actions, which current unit can carry out.
+			-- Returns actions, which current unit can complete.
 			-- TODO: make this STATE_DEPENDENT
 		deferred
 		ensure
