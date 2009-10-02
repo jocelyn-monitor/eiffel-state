@@ -36,10 +36,6 @@ feature -- Element change
 	move (new_position: POSITION) is
 			-- Time which is taken by changing `position' to `new_position'
 		do
-			--(unit_manager.units_in_cells @ position.x @ position.y).prune (Current)
 			position := new_position
-			--(unit_manager.units_in_cells @ position.x @ position.y).extend (Current)
-		ensure
-			position_set: position.equals (new_position)
 		end
 end

@@ -135,16 +135,36 @@ feature {NONE} -- Implementation
 
 	widget_button_press (x, y, button: INTEGER; x_tilt, y_tilt, pressure: DOUBLE; screen_x, screen_y: INTEGER) is
 			-- A pointer button press event has occurred on the test widget
+		local
+			being: BEING
+			moved: BOOLEAN
 		do
-			if (user_state = Watching) then
+--			io.put_integer (button)
+			if (button = 1) then
 				user_state := Started_selecting_units
 				save_mouse_coordinates (x, y)
 				mouse_press_x := x
 				mouse_press_y := y
 				draw
 				user_state := Selecting_units
-			elseif (user_state = Choosing_action) then
-
+			elseif (button = 3 and not selected_units.is_empty) then
+				moved := False
+				from
+					selected_units.start
+				until
+					selected_units.after
+				loop
+					being ?= selected_units.item
+					if (being /= Void and map_manager.position_at (x, y).passable) then
+						being.move (map_manager.position_at (x, y))
+						moved := True
+					end
+					selected_units.forth
+				end
+				if (moved) then
+					draw_all (0, 0, 0, 0)
+				end
+				user_state := Watching
 			end
 		end
 
@@ -166,7 +186,7 @@ feature {NONE} -- Implementation
 				user_state := Finished_selecting_units
 				save_mouse_coordinates (x, y)
 				draw
---				user_state := Choosing_action
+				user_state := Choosing_action
 				from
 					actions := unit_manager.available_actions (selected_units)
 					actions.start
@@ -177,7 +197,7 @@ feature {NONE} -- Implementation
 					io.put_new_line
 					actions.forth
 				end
-				user_state := Watching
+--				user_state := Watching
 			end
 		end
 
@@ -208,9 +228,12 @@ feature {NONE} -- Implementation: States
 	sd_delete_selecting_frame: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 			-- Deletes selecting frame if `user_state' is either `Selecting_units' or `Finished_selecting_units'
 		do
-			create Result.make (2)
+			create Result.make (5)
+			Result.add_behavior (Watching, agent true_agent, agent do_nothing, Watching)
+			Result.add_behavior (Started_selecting_units, agent true_agent, agent do_nothing, Started_selecting_units)
 			Result.add_behavior (Selecting_units, agent true_agent, agent delete_selecting_frame, Selecting_units)
 			Result.add_behavior (Finished_selecting_units, agent true_agent, agent delete_selecting_frame, Finished_selecting_units)
+			Result.add_behavior (Choosing_action, agent true_agent, agent do_nothing, Choosing_action)
 		end
 
 invariant
