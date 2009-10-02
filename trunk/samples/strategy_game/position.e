@@ -13,6 +13,13 @@ inherit
 			state as relief_state
 		redefine
 			out
+		select
+			out,
+			default_create
+		end
+	ENVIRONMENT
+		rename
+			out as env_out
 		end
 
 create
@@ -73,6 +80,13 @@ feature -- State dependent: Status report
 			Result := sd_color.item ([], relief_state)
 		end
 
+	passable: BOOLEAN is
+			-- Returns if being can pass through this POSITION
+		do
+			Result := sd_passable.item ([], relief_state)
+		end
+
+
 feature -- Output
 	out: STRING is
 			-- String representation in form (`x', `y', `relief')
@@ -93,7 +107,7 @@ feature {NONE} -- Implementation
 			until
 				i = States.count + 1
 			loop
-				Result.add_result (States @ i, agent : BOOLEAN do Result := True end, Crossing_times @ i)
+				Result.add_result (States @ i, agent true_agent, Crossing_times @ i)
 				i := i + 1
 			end
 		end
@@ -109,9 +123,19 @@ feature {NONE} -- Implementation
 			until
 				i = States.count + 1
 			loop
-				Result.add_result (States @ i, agent : BOOLEAN do Result := True end, Colors @ i)
+				Result.add_result (States @ i, agent true_agent, Colors @ i)
 				i := i + 1
 			end
+		end
+
+	sd_passable: STATE_DEPENDENT_FUNCTION [TUPLE, BOOLEAN] is
+		once
+			create Result.make (5)
+			Result.add_result (States.item (1), agent true_agent, True)
+			Result.add_result (States.item (2), agent true_agent, True)
+			Result.add_result (States.item (3), agent true_agent, True)
+			Result.add_result (States.item (4), agent true_agent, False)
+			Result.add_result (States.item (5), agent true_agent, True)
 		end
 
 	get_relief_state (relief_type: INTEGER): STATE is
