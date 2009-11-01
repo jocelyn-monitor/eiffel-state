@@ -19,7 +19,7 @@ create
 
 feature {NONE} -- Initialization
 
-	make (w, h: INTEGER; widget: EV_WIDGET;) is
+	make (w, h: INTEGER; widget: EV_WIDGET) is
 		do
 			main_widget := widget
 			Window_width := w
