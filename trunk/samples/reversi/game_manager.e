@@ -1,5 +1,5 @@
 indexing
-	description: "Summary description for {GAME_MANAGER}."
+	description: "Game manager"
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -21,14 +21,56 @@ inherit
 create
 	default_create
 
+feature {NONE} -- Initialization
+	default_create is
+		do
+			turn_state := Black_turn
+		end
+
+	initialize_markers is
+			-- Create data structure for markers and add starting 4 markers
+		local
+			i, j: INTEGER
+		do
+			create markers.make (0, dimension - 1)
+			from
+				i := 0
+			until
+				i = dimension
+			loop
+				markers.put (create {ARRAY [MARKER]}.make (0, dimension - 1), i)
+				from
+					j := 0
+				until
+					j = dimension
+				loop
+					markers.item (i).put (create {MARKER}.make (i, j), j)
+					j := j + 1
+				end
+				i := i + 1
+			end
+			markers.item (3).item (3).show_hint (true)
+			markers.item (3).item (3).make_move
+			markers.item (3).item (4).show_hint (false)
+			markers.item (3).item (4).make_move
+			markers.item (4).item (3).show_hint (false)
+			markers.item (4).item (3).make_move
+			markers.item (4).item (4).show_hint (true)
+			markers.item (4).item (4).make_move
+			white_markers := 2
+			black_markers := 2
+			show_hints
+		end
+
 feature -- Access
 	markers: ARRAY [ARRAY [MARKER]]
 
 	dimension: INTEGER is 8
 
-	white_markers: INTEGER
-
-	black_markers: INTEGER
+	is_game_over: BOOLEAN is
+		do
+			Result := not can_move and not can_opp_move
+		end
 
 feature -- Change status
 	restart is
@@ -38,23 +80,22 @@ feature -- Change status
 			turn_state := sd_restart.next_state
 		end
 
-
 	make_move (x, y: INTEGER) is
 			-- Put new marker at given position and repaint some markers
 		local
 			flipped: LIST [MARKER]
-			new_marker: MARKER
 		do
-			if (markers.item (x).item (y) = Void) then
-				create new_marker.make (x, y, sd_is_white_turn.item ([], turn_state))
-				flipped := flipped_markers (new_marker, x, y)
+			if (markers.item (x).item (y).has_hint) then
+				markers.item (x).item (y).make_move
+				clear_hints
+				flipped := flipped_markers (sd_is_white_turn.item ([], turn_state), x, y)
 				if (not flipped.is_empty) then
 					from
 						flipped.start
 					until
 						flipped.after
 					loop
-						flipped.item.change_color
+						flipped.item.flip
 						flipped.forth
 					end
 					if (sd_is_white_turn.item ([], turn_state)) then
@@ -64,8 +105,6 @@ feature -- Change status
 						black_markers := black_markers + 1 + flipped.count
 						white_markers:= white_markers - flipped.count
 					end
-					markers.item (x).put (new_marker, y)
-					gui_manager.repaint (x, y)
 					sd_turn_made.call ([], turn_state)
 					turn_state := sd_turn_made.next_state
 					update_status
@@ -74,10 +113,15 @@ feature -- Change status
 					sd_check_turn.call ([], turn_state)
 					turn_state := sd_check_turn.next_state
 					update_status
+
+					if (not is_game_over) then
+						show_hints
+					end
 				end
 			end
 		end
 
+feature {NONE} -- Implementation: Status report
 	can_move: BOOLEAN is
 			-- Can player make a move
 		do
@@ -95,18 +139,64 @@ feature -- Change status
 			Result := not can_move and can_opp_move
 		end
 
-	is_game_over: BOOLEAN is
+	is_valid_position (x, y: INTEGER): BOOLEAN is
 		do
-			Result := not can_move and not can_opp_move
+			Result := (x >= 0) and (x < dimension) and (y >= 0) and (y < dimension)
 		end
 
+feature {NONE} -- Implementation: Change status
+
+	update_status is
+			-- Update status in status bar
+		local
+			msg: STRING
+		do
+			create msg.make_empty
+			msg.append (turn_state.name)
+			msg.append (". Score: ")
+			msg.append (black_markers.out)
+			msg.append (":")
+			msg.append (white_markers.out)
+			gui_manager.set_status (msg)
+		end
+
+	set_move_changed is
+			-- Give to another player ability to make move
+		local
+			msg: STRING
+			status: STRING
+		do
+			create msg.make_from_string ("It was ")
+			create status.make_from_string (turn_state.name)
+			status.to_lower
+			msg.append (status)
+			msg.append (" now. But he can't make move, therefore his opponent should do.")
+			gui_manager.show_message (msg)
+		end
+
+	set_game_over is
+		local
+			msg: STRING
+		do
+			create msg.make_from_string ("Game over.")
+			if (game_manager.white_markers > game_manager.black_markers) then
+				msg.append ("White markers have won.")
+			else
+				msg.append ("Black markers have won.")
+			end
+			gui_manager.show_message (msg)
+		end
+
+feature {GAME_MANAGER} -- Implementation
+	white_markers: INTEGER
+
+	black_markers: INTEGER
 
 	valid_moves (is_white: BOOLEAN): LIST [POSITION] is
 			-- Returns valid moves in current game situation
 		local
 			i, j :INTEGER
 			flipped: LIST [MARKER]
-			new_marker: MARKER
 		do
 			Result := create {LINKED_LIST [POSITION]}.make
 			from
@@ -119,9 +209,8 @@ feature -- Change status
 				until
 					j = dimension
 				loop
-					if (markers.item (i).item (j) = Void) then
-						create new_marker.make (i, j, is_white)
-						flipped := flipped_markers (new_marker, i, j)
+					if (markers.item (i).item (j).is_free) then
+						flipped := flipped_markers (is_white, i, j)
 						if (not flipped.is_empty) then
 							Result.extend (create {POSITION}.make (i, j))
 						end
@@ -132,8 +221,44 @@ feature -- Change status
 			end
 		end
 
+	show_hints is
+			-- Show markers with special color to give player all available positions for move
+		local
+			moves: LIST [POSITION]
+		do
+			moves := valid_moves (sd_is_white_turn.item ([], turn_state))
+			from
+				moves.start
+			until
+				moves.after
+			loop
+				markers.item (moves.item.x).item (moves.item.y).show_hint (sd_is_white_turn.item ([], turn_state))
+				moves.forth
+			end
+		end
 
-	flipped_markers (new_marker: MARKER; x, y: INTEGER): LIST [MARKER] is
+	clear_hints is
+		local
+			i, j: INTEGER
+		do
+			from
+				i := 0
+			until
+				i = dimension
+			loop
+				from
+					j := 0
+				until
+					j = dimension
+				loop
+					markers.item (i).item (j).clear_hint
+					j := j + 1
+				end
+				i := i + 1
+			end
+		end
+
+	flipped_markers (is_new_white: BOOLEAN; x, y: INTEGER): LIST [MARKER] is
 			-- Returns markers which would be flipped if new marker is put at (x, y)
 		local
 			dx, dy: ARRAY [INTEGER] -- delta x and delta y
@@ -151,14 +276,14 @@ feature -- Change status
 					j := 1
 				until
 					(not is_valid_position (x + dx.item (i) * j, y + dy.item (i) * j)) or
-						markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j) = Void or
-						new_marker.is_same_color (markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j))
+						markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j).is_free or
+						(not markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j).is_white xor is_new_white)
 				loop
 					j := j + 1
 				end
-				if (is_valid_position (x + dx.item (i) * j, y + dy.item (i) * j)) and
-					markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j) /= Void and
-					new_marker.is_same_color (markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j)) then
+				if (is_valid_position (x + dx.item (i) * j, y + dy.item (i) * j) and
+					(not markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j).is_free) and
+					(not markers.item (x + dx.item (i) * j).item (y + dy.item (i) * j).is_white xor is_new_white)) then
 					from
 						k := 1
 					until
@@ -170,55 +295,6 @@ feature -- Change status
 				end
 				i := i + 1
 			end
-		end
-
-	is_valid_position (x, y: INTEGER): BOOLEAN is
-		do
-			Result := (x >= 0) and (x < dimension) and (y >= 0) and (y < dimension)
-		end
-
-feature -- Initialization
-	default_create is
-		do
-			turn_state := Black_turn
-			initialize_markers
-			update_status
-		end
-
-	initialize_markers is
-			-- Create data structure for markers and add starting 4 markers
-		local
-			i: INTEGER
-		do
-			create markers.make (0, dimension - 1)
-			from
-				i := 0
-			until
-				i = dimension
-			loop
-				markers.put (create {ARRAY [MARKER]}.make (0, dimension), i)
-				i := i + 1
-			end
-			markers.item (3).put (create {MARKER}.make (3, 3, true), 3)
-			markers.item (3).put (create {MARKER}.make (3, 4, false), 4)
-			markers.item (4).put (create {MARKER}.make (4, 3, false), 3)
-			markers.item (4).put (create {MARKER}.make (4, 4, true), 4)
-			white_markers := 2
-			black_markers := 2
-		end
-
-	update_status is
-			-- Update status in status bar
-		local
-			msg: STRING
-		do
-			create msg.make_empty
-			msg.append (turn_state.name)
-			msg.append (". Score: ")
-			msg.append (black_markers.out)
-			msg.append (":")
-			msg.append (white_markers.out)
-			gui_manager.set_status (msg)
 		end
 
 feature {NONE} -- State dependent implementation
@@ -252,10 +328,10 @@ feature {NONE} -- State dependent implementation
 			create Result.make (4)
 			Result.add_behavior (White_turn, agent can_move, agent do_nothing, White_turn)
 			Result.add_behavior (Black_turn, agent can_move, agent do_nothing, Black_turn)
-			Result.add_behavior (White_turn, agent cant_move_but_opp_can, agent do_nothing, Black_turn)
-			Result.add_behavior (Black_turn, agent cant_move_but_opp_can, agent do_nothing, White_turn)
-			Result.add_behavior (White_turn, agent is_game_over, agent gui_manager.show_game_over_dialog, Game_over)
-			Result.add_behavior (Black_turn, agent is_game_over, agent gui_manager.show_game_over_dialog, Game_over)
+			Result.add_behavior (White_turn, agent cant_move_but_opp_can, agent set_move_changed, Black_turn)
+			Result.add_behavior (Black_turn, agent cant_move_but_opp_can, agent set_move_changed, White_turn)
+			Result.add_behavior (White_turn, agent is_game_over, agent set_game_over, Game_over)
+			Result.add_behavior (Black_turn, agent is_game_over, agent set_game_over, Game_over)
 		end
 
 	sd_turn_made: STATE_DEPENDENT_PROCEDURE [TUPLE] is

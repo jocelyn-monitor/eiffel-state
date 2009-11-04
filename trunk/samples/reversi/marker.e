@@ -1,5 +1,5 @@
 indexing
-	description: "Summary description for {MARKER}."
+	description: "Class, which describes marker and its state."
 	author: ""
 	date: "$Date$"
 	revision: "$Revision$"
@@ -12,34 +12,61 @@ create
 	make
 
 feature -- Status
-	is_same_color (marker: MARKER): BOOLEAN is
-		require
-			marker_not_null: marker /= Void
+	is_white: BOOLEAN is
 		do
-			Result := color_state.name = marker.color_state.name
+			Result := sd_is_white.item ([], color_state)
+		end
+
+	is_free: BOOLEAN is
+		do
+			Result := sd_is_free.item ([], color_state)
+		end
+
+	has_hint: BOOLEAN is
+		do
+			Result := sd_has_hint.item ([], color_state)
 		end
 
 feature {GAME_MANAGER} -- Change status
-	change_color is
+	flip is
 			-- Change color of marker if it was flipped
 		do
-			sd_change_color.call ([], color_state)
-			color_state := sd_change_color.next_state
-			gui_manager.repaint (x, y)
+			sd_flip.call ([], color_state)
+			color_state := sd_flip.next_state
+			draw (gui_manager.drawable_widget, gui_manager.cell_size)
 		end
 
+	show_hint (is_white_hint: BOOLEAN) is
+			-- Show hint for a player by marker which is lighter or darker than background
+		do
+			sd_show_hint.call ([is_white_hint], color_state)
+			color_state := sd_show_hint.next_state
+			draw (gui_manager.drawable_widget, gui_manager.cell_size)
+		end
+
+	clear_hint is
+			-- Change color of marker which contained hint for player
+		do
+			sd_clear_hint.call ([], color_state)
+			color_state := sd_clear_hint.next_state
+			draw (gui_manager.drawable_widget, gui_manager.cell_size)
+		end
+
+	make_move is
+			-- Player made move in this cell
+		do
+			sd_move_made.call ([], color_state)
+			color_state := sd_move_made.next_state
+			draw (gui_manager.drawable_widget, gui_manager.cell_size)
+		end
 
 feature -- Initialization
-	make (xc, yc: INTEGER; is_white: BOOLEAN) is
+	make (xc, yc: INTEGER) is
 			-- Create marker given its coordinates
 		do
 			x := xc
 			y := yc
-			if (is_white) then
-				color_state := White
-			else
-				color_state := Black
-			end
+			color_state := Empty
 		end
 
 feature -- Output
@@ -55,20 +82,85 @@ feature {MARKER} -- State dependent features
 
 	White: STATE is once create Result.make ("White") end
 	Black: STATE is once create Result.make ("Black") end
+	Empty: STATE is once create Result.make ("Empty") end
+
+	-- Black or white marker can be put there
+	Black_can: STATE is once create Result.make ("Black can") end
+	White_can: STATE is once create Result.make ("White can") end
 
 	sd_color: STATE_DEPENDENT_FUNCTION [TUPLE, EV_COLOR] is
 			-- Returns color of marker, according to its state
 		once
-			create Result.make (2)
+			create Result.make (5)
 			Result.add_result (White, agent true_agent, create {EV_COLOR}.make_with_rgb (1, 1, 1))
 			Result.add_result (Black, agent true_agent, create {EV_COLOR}.make_with_rgb (0, 0, 0))
+			Result.add_result (Empty, agent true_agent, gui_manager.background)
+			Result.add_result (White_can, agent true_agent, gui_manager.lighter_background)
+			Result.add_result (Black_can, agent true_agent, gui_manager.darker_background)
 		end
 
-	sd_change_color: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+	sd_is_white: STATE_DEPENDENT_FUNCTION [TUPLE, BOOLEAN] is
+			-- Returns if marker is white
+		once
+			create Result.make (5)
+			Result.add_result (White, agent true_agent, true)
+			Result.add_result (Black, agent true_agent, false)
+			Result.add_result (Empty, agent true_agent, false)
+			Result.add_result (White_can, agent true_agent, false)
+			Result.add_result (Black_can, agent true_agent, false)
+		end
+
+	sd_is_free: STATE_DEPENDENT_FUNCTION [TUPLE, BOOLEAN] is
+			-- Returns if marker was already put on the board
+		once
+			create Result.make (5)
+			Result.add_result (White, agent true_agent, false)
+			Result.add_result (Black, agent true_agent, false)
+			Result.add_result (Empty, agent true_agent, true)
+			Result.add_result (White_can, agent true_agent, true)
+			Result.add_result (Black_can, agent true_agent, true)
+		end
+
+	sd_has_hint: STATE_DEPENDENT_FUNCTION [TUPLE, BOOLEAN] is
+			-- Returns if marker has hint now
+		once
+			create Result.make (5)
+			Result.add_result (White, agent true_agent, false)
+			Result.add_result (Black, agent true_agent, false)
+			Result.add_result (Empty, agent true_agent, false)
+			Result.add_result (White_can, agent true_agent, true)
+			Result.add_result (Black_can, agent true_agent, true)
+		end
+
+	sd_flip: STATE_DEPENDENT_PROCEDURE [TUPLE] is
 		once
 			create Result.make (2)
 			Result.add_behavior (White, agent true_agent, agent do_nothing, Black)
 			Result.add_behavior (Black, agent true_agent, agent do_nothing, White)
+		end
+
+	sd_move_made: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+		once
+			create Result.make (2)
+			Result.add_behavior (White_can, agent true_agent, agent do_nothing, White)
+			Result.add_behavior (Black_can, agent true_agent, agent do_nothing, Black)
+		end
+
+	sd_show_hint: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+		once
+			create Result.make (2)
+			Result.add_behavior (Empty, agent trivial_agent, agent do_nothing, White_can)
+			Result.add_behavior (Empty, agent opposite_agent, agent do_nothing, Black_can)
+		end
+
+	sd_clear_hint: STATE_DEPENDENT_PROCEDURE [TUPLE] is
+		once
+			create Result.make (5)
+			Result.add_behavior (White, agent true_agent, agent do_nothing, White)
+			Result.add_behavior (Black, agent true_agent, agent do_nothing, Black)
+			Result.add_behavior (Empty, agent true_agent, agent do_nothing, Empty)
+			Result.add_behavior (White_can, agent true_agent, agent do_nothing, Empty)
+			Result.add_behavior (Black_can, agent true_agent, agent do_nothing, Empty)
 		end
 
 feature {NONE} -- Implementation
