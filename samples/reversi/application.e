@@ -9,13 +9,10 @@ class
 
 inherit
 	EV_APPLICATION
-		select
+	ENVIRONMENT
+		undefine
 			default_create,
 			copy
-		end
-	ENVIRONMENT
-		rename
-			copy as env_copy
 		end
 
 create

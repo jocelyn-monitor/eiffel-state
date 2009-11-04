@@ -15,7 +15,7 @@ feature -- Access
 	Menu_file_item: STRING is "&File"
 			-- String for menu "File"
 
-	Menu_file_new_item: STRING is "&New%TCtrl+N"
+	Menu_file_new_item: STRING is "Start new game"
 			-- String for menu "File/New"
 
 	Menu_file_open_item: STRING is "&Open...%TCtrl+O"
@@ -39,7 +39,7 @@ feature -- Access
 	Menu_help_contents_item: STRING is "&Contents and Index"
 			-- String for menu "Help/Contents and Index"
 
-	Menu_help_about_item: STRING is "&About..."
+	Menu_help_about_item: STRING is "About..."
 			-- String for menu "Help/About"
 
 	Label_confirm_close_window: STRING is "Do you want to exit from unsaved game?"
