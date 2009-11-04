@@ -25,10 +25,14 @@ feature {NONE} -- Initialization
 		do
 			default_create
 			gui := gui_manager
+			game_mgr := game_manager
+			game_mgr.restart
+			gui.show_first_window
 			launch
 		end
 
 feature {NONE} -- Implementation
 	gui: GUI_MANAGER
+	game_mgr: GAME_MANAGER
 
 end -- class APPLICATION

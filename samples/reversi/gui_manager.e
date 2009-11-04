@@ -20,8 +20,29 @@ create
 	default_create
 
 feature -- Access
-	first_window: MAIN_WINDOW
-			-- Main window.
+	background: EV_COLOR is
+		do
+			create Result.make_with_rgb (0.2, 0.8, 0.2)
+		end
+
+	lighter_background: EV_COLOR is
+			-- Color which is slightly lighter then background
+		do
+			create Result.make_with_rgb (0.25, 1, 0.25)
+		end
+
+	darker_background: EV_COLOR is
+			-- Color which is slightly darker then background
+		do
+			create Result.make_with_rgb (0.15, 0.6, 0.15)
+		end
+
+	cell_size: INTEGER is
+		do
+			Result := field_size // game_manager.dimension
+		end
+
+	drawable_widget: EV_DRAWING_AREA
 
 feature -- Status setting
 	set_status (text: STRING_GENERAL)
@@ -29,19 +50,17 @@ feature -- Status setting
 			first_window.set_status_bar_text (text)
 		end
 
-	show_game_over_dialog is
+	show_message (msg: STRING) is
 		local
 			dialog: EV_INFORMATION_DIALOG
-			msg: STRING
 		do
-			create msg.make_from_string ("Game over.")
-			if (game_manager.white_markers > game_manager.black_markers) then
-				msg.append ("White markers have won.")
-			else
-				msg.append ("Black markers have won.")
-			end
 			create dialog.make_with_text (msg)
 			dialog.show_modal_to_window (first_window)
+		end
+
+	show_first_window is
+		do
+			first_window.show
 		end
 
 	draw (arg1, arg2, arg3, arg4: INTEGER) is
@@ -71,23 +90,14 @@ feature -- Status setting
 				until
 					j = game_manager.markers.item (i).count
 				loop
-					if (game_manager.markers.item (i).item (j) /= Void) then
-						game_manager.markers.item (i).item (j).draw (drawable_widget, field_size // game_manager.dimension)
-					end
+					game_manager.markers.item (i).item (j).draw (drawable_widget, field_size // game_manager.dimension)
 					j := j + 1
 				end
 				i := i + 1
 			end
 		end
 
-	repaint (x, y: INTEGER) is
-			-- Repaint cell
-		do
-			game_manager.markers.item (x).item (y).draw (drawable_widget, field_size // game_manager.dimension)
-		end
-
-
-feature {NONE} -- Implementation
+feature {NONE} -- Initialization
 	default_create is
 			-- Prepare the first window to be displayed.
 		do
@@ -101,10 +111,12 @@ feature {NONE} -- Implementation
 			create first_window.make (field_size + 11, field_size + 72, drawable_widget)
 
 				-- Show the first window.
-				--| TODO: Remove this line if you don't want the first
-				--|       window to be shown at the start of the program.
 			first_window.show
 		end
+
+feature {NONE} -- Implementation
+	first_window: MAIN_WINDOW
+			-- Main window.
 
 	widget_button_press (x, y, button: INTEGER; x_tilt, y_tilt, pressure: DOUBLE; screen_x, screen_y: INTEGER) is
 			-- A pointer button press event has occurred on the test widget
@@ -112,13 +124,6 @@ feature {NONE} -- Implementation
 			game_manager.make_move (x // (field_size // game_manager.dimension), y // (field_size // game_manager.dimension))
 		end
 
-	drawable_widget: EV_DRAWING_AREA
-
 	field_size: INTEGER is 400
-
-	background: EV_COLOR is
-		do
-			create Result.make_with_rgb (0.2, 0.8, 0.2)
-		end
 
 end

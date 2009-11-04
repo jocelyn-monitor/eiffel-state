@@ -24,4 +24,16 @@ feature -- Access
 			Result := True
 		end
 
+	trivial_agent (arg: BOOLEAN): BOOLEAN is
+			-- Returns input
+		do
+			Result := arg
+		end
+
+	opposite_agent (arg: BOOLEAN): BOOLEAN is
+		do
+			Result := not arg
+		end
+
+
 end
