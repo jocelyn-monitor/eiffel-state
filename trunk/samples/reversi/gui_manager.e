@@ -10,18 +10,38 @@ inherit
 	AUTOMATED
 		redefine
 			default_create
-		select
-			default_create
 		end
 	ENVIRONMENT
+		undefine
+			default_create
+		end
 
 create
 	default_create
+
+feature -- Access
+	first_window: MAIN_WINDOW
+			-- Main window.
 
 feature -- Status setting
 	set_status (text: STRING_GENERAL)
 		do
 			first_window.set_status_bar_text (text)
+		end
+
+	show_game_over_dialog is
+		local
+			dialog: EV_INFORMATION_DIALOG
+			msg: STRING
+		do
+			create msg.make_from_string ("Game over.")
+			if (game_manager.white_markers > game_manager.black_markers) then
+				msg.append ("White markers have won.")
+			else
+				msg.append ("Black markers have won.")
+			end
+			create dialog.make_with_text (msg)
+			dialog.show_modal_to_window (first_window)
 		end
 
 	draw (arg1, arg2, arg3, arg4: INTEGER) is
@@ -91,10 +111,6 @@ feature {NONE} -- Implementation
 		do
 			game_manager.make_move (x // (field_size // game_manager.dimension), y // (field_size // game_manager.dimension))
 		end
-
-
-	first_window: MAIN_WINDOW
-			-- Main window.
 
 	drawable_widget: EV_DRAWING_AREA
 

@@ -21,6 +21,12 @@ inherit
 			default_create, copy
 		end
 
+	ENVIRONMENT
+		undefine
+			default_create,
+			copy
+		end
+
 create
 	make
 
@@ -135,24 +141,7 @@ feature {NONE} -- Menu Implementation
 		do
 			create file_menu.make_with_text (Menu_file_item)
 
-			create menu_item.make_with_text (Menu_file_new_item)
-				--| TODO: Add the action associated with "New" here.
-			file_menu.extend (menu_item)
-
-			create menu_item.make_with_text (Menu_file_open_item)
-				--| TODO: Add the action associated with "Open" here.
-			file_menu.extend (menu_item)
-
-			create menu_item.make_with_text (Menu_file_save_item)
-				--| TODO: Add the action associated with "Save" here.
-			file_menu.extend (menu_item)
-
-			create menu_item.make_with_text (Menu_file_saveas_item)
-				--| TODO: Add the action associated with "Save As..." here.
-			file_menu.extend (menu_item)
-
-			create menu_item.make_with_text (Menu_file_close_item)
-				--| TODO: Add the action associated with "Close" here.
+			create menu_item.make_with_text_and_action (Menu_file_new_item, agent do game_manager.restart gui_manager.draw (0, 0, 0, 0) end)
 			file_menu.extend (menu_item)
 
 			file_menu.extend (create {EV_MENU_SEPARATOR})
@@ -175,12 +164,20 @@ feature {NONE} -- Menu Implementation
 		do
 			create help_menu.make_with_text (Menu_help_item)
 
-			create menu_item.make_with_text (Menu_help_contents_item)
-				--| TODO: Add the action associated with "Contents and Index" here.
+			create menu_item.make_with_text_and_action (Menu_help_about_item, agent show_about_dialog)
 			help_menu.extend (menu_item)
 		ensure
 			help_menu_created: help_menu /= Void and then not help_menu.is_empty
 		end
+
+	show_about_dialog is
+		local
+			dialog: ABOUT_DIALOG
+		do
+			create dialog
+			dialog.show
+		end
+
 
 feature {NONE} -- StatusBar Implementation
 

@@ -7,12 +7,6 @@ indexing
 class
 	ENVIRONMENT
 
-inherit
-	ANY
-		rename
-			default_create as env_create
-		end
-
 feature -- Access
 	gui_manager: GUI_MANAGER is
 		once
