@@ -72,6 +72,15 @@ feature -- Access
 			Result := not can_move and not can_opp_move
 		end
 
+	undo_last_move is
+		do
+			if (last_move /= Void) then
+				turn_state := last_move_state
+				markers.item (last_move.x).item (last_move.y)
+			end
+		end
+
+
 feature -- Change status
 	restart is
 			-- Restarts game
@@ -188,6 +197,9 @@ feature {NONE} -- Implementation: Change status
 		end
 
 feature {GAME_MANAGER} -- Implementation
+
+	last_move: POSITION
+
 	white_markers: INTEGER
 
 	black_markers: INTEGER
@@ -298,6 +310,8 @@ feature {GAME_MANAGER} -- Implementation
 		end
 
 feature {NONE} -- State dependent implementation
+
+	last_move_state: STATE
 
 	White_turn: STATE is once create Result.make ("White turn") end
 	Black_turn: STATE is once create Result.make ("Black turn") end

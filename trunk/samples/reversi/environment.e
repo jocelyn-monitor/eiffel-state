@@ -35,5 +35,4 @@ feature -- Access
 			Result := not arg
 		end
 
-
 end
