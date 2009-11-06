@@ -106,7 +106,7 @@ feature {NONE} -- Menu Implementation
 			-- Standard menu bar for this window.
 
 	file_menu: EV_MENU
-			-- "File" menu for this window (contains New, Open, Close, Exit...)
+			-- "File" menu for this window (contains New, Undo, Exit...)
 
 	help_menu: EV_MENU
 			-- "Help" menu for this window (contains About...)
@@ -141,7 +141,10 @@ feature {NONE} -- Menu Implementation
 		do
 			create file_menu.make_with_text (Menu_file_item)
 
-			create menu_item.make_with_text_and_action (Menu_file_new_item, agent do game_manager.restart gui_manager.draw (0, 0, 0, 0) end)
+			create menu_item.make_with_text_and_action (Menu_file_new_item, agent do game_manager.restart end)
+			file_menu.extend (menu_item)
+
+			create menu_item.make_with_text_and_action (Menu_file_undo_item, agent do game_manager.undo_last_move end)
 			file_menu.extend (menu_item)
 
 			file_menu.extend (create {EV_MENU_SEPARATOR})
@@ -218,16 +221,19 @@ feature {NONE} -- Implementation, Close event
 		local
 			question_dialog: EV_CONFIRMATION_DIALOG
 		do
-			create question_dialog.make_with_text (Label_confirm_close_window)
-			question_dialog.show_modal_to_window (Current)
+			if (not game_manager.is_game_over) then
+				create question_dialog.make_with_text (Label_confirm_close_window)
+				question_dialog.show_modal_to_window (Current)
 
-			if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
+				if question_dialog.selected_button.is_equal ((create {EV_DIALOG_CONSTANTS}).ev_ok) then
 					-- Destroy the window
-				destroy;
+					destroy;
 
 					-- End the application
-					--| TODO: Remove this line if you don't want the application
-					--|       to end when the first window is closed..
+					(create {EV_ENVIRONMENT}).application.destroy
+				end
+			else
+				destroy;
 				(create {EV_ENVIRONMENT}).application.destroy
 			end
 		end

@@ -103,33 +103,33 @@ feature {MARKER} -- State dependent features
 			-- Returns if marker is white
 		once
 			create Result.make (5)
-			Result.add_result (White, agent true_agent, true)
-			Result.add_result (Black, agent true_agent, false)
-			Result.add_result (Empty, agent true_agent, false)
-			Result.add_result (White_can, agent true_agent, false)
-			Result.add_result (Black_can, agent true_agent, false)
+			Result.add_result (White, agent true_agent, True)
+			Result.add_result (Black, agent true_agent, False)
+			Result.add_result (Empty, agent true_agent, False)
+			Result.add_result (White_can, agent true_agent, False)
+			Result.add_result (Black_can, agent true_agent, False)
 		end
 
 	sd_is_free: STATE_DEPENDENT_FUNCTION [TUPLE, BOOLEAN] is
 			-- Returns if marker was already put on the board
 		once
 			create Result.make (5)
-			Result.add_result (White, agent true_agent, false)
-			Result.add_result (Black, agent true_agent, false)
-			Result.add_result (Empty, agent true_agent, true)
-			Result.add_result (White_can, agent true_agent, true)
-			Result.add_result (Black_can, agent true_agent, true)
+			Result.add_result (White, agent true_agent, False)
+			Result.add_result (Black, agent true_agent, False)
+			Result.add_result (Empty, agent true_agent, True)
+			Result.add_result (White_can, agent true_agent, True)
+			Result.add_result (Black_can, agent true_agent, True)
 		end
 
 	sd_has_hint: STATE_DEPENDENT_FUNCTION [TUPLE, BOOLEAN] is
 			-- Returns if marker has hint now
 		once
 			create Result.make (5)
-			Result.add_result (White, agent true_agent, false)
-			Result.add_result (Black, agent true_agent, false)
-			Result.add_result (Empty, agent true_agent, false)
-			Result.add_result (White_can, agent true_agent, true)
-			Result.add_result (Black_can, agent true_agent, true)
+			Result.add_result (White, agent true_agent, False)
+			Result.add_result (Black, agent true_agent, False)
+			Result.add_result (Empty, agent true_agent, False)
+			Result.add_result (White_can, agent true_agent, True)
+			Result.add_result (Black_can, agent true_agent, True)
 		end
 
 	sd_flip: STATE_DEPENDENT_PROCEDURE [TUPLE] is

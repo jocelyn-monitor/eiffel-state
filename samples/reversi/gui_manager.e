@@ -67,10 +67,14 @@ feature -- Status setting
 			-- Draw field and all markers on it
 		local
 			i, j: INTEGER
+			ch: CHARACTER
 		do
+			-- Background
 			drawable_widget.set_foreground_color (background)
-			drawable_widget.fill_rectangle (0, 0, field_size, field_size)
+			drawable_widget.fill_rectangle (0, 0, first_window.width, first_window.height)
 			drawable_widget.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 0))
+
+			-- Grid
 			from
 				i := 0
 			until
@@ -80,6 +84,29 @@ feature -- Status setting
 				drawable_widget.draw_segment (0, i * field_size // game_manager.dimension, field_size, i * field_size // game_manager.dimension)
 				i := i + 1
 			end
+
+			-- Rows and columns titles
+			from
+				i := 1
+			until
+				i = game_manager.dimension + 1
+			loop
+				drawable_widget.draw_text (field_size + cell_size // 8 - 2, (game_manager.dimension - i) * cell_size + cell_size // 2 + 5, i.out)
+				i := i + 1
+			end
+
+			from
+				i := 0
+				ch := 'A'
+			until
+				ch = 'A' + game_manager.dimension
+			loop
+				drawable_widget.draw_text (i * cell_size + cell_size // 2 - 4, field_size + cell_size // 8 + 5, ch.out)
+				i := i + 1
+				ch := ch + 1
+			end
+
+			-- Markers
 			from
 				i := 0
 			until
@@ -108,7 +135,7 @@ feature {NONE} -- Initialization
 			drawable_widget.expose_actions.extend (agent draw)
 
 				-- create and initialize the first window.
-			create first_window.make (field_size + 11, field_size + 72, drawable_widget)
+			create first_window.make (field_size + cell_size // 4 + 11, field_size + cell_size // 4 + 72, drawable_widget)
 
 				-- Show the first window.
 			first_window.show
