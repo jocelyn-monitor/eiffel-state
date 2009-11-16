@@ -39,6 +39,8 @@ feature -- Status setting
 feature -- Initialization
 	make (w, h: INTEGER; widget: EV_WIDGET) is
 			-- Create main window with given width and height, also put widget into main container
+		require
+			w >= 0 and h >= 0
 		do
 			Window_width := w
 			Window_height := h
@@ -75,9 +77,11 @@ feature {NONE} -- Initialization
 				-- Set the initial size of the window
 			set_size (Window_width, Window_height)
 
+			set_minimum_size (200, 270)
+
 			set_centered
 
-			disable_user_resize
+			--disable_user_resize
 		end
 
 	set_centered is
@@ -142,9 +146,6 @@ feature {NONE} -- Menu Implementation
 			create file_menu.make_with_text (Menu_file_item)
 
 			create menu_item.make_with_text_and_action (Menu_file_new_item, agent do game_manager.restart end)
-			file_menu.extend (menu_item)
-
-			create menu_item.make_with_text_and_action (Menu_file_undo_item, agent do game_manager.undo_last_move end)
 			file_menu.extend (menu_item)
 
 			file_menu.extend (create {EV_MENU_SEPARATOR})

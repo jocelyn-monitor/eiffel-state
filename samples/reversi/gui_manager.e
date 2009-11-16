@@ -45,12 +45,16 @@ feature -- Access
 	drawable_widget: EV_DRAWING_AREA
 
 feature -- Status setting
-	set_status (text: STRING_GENERAL)
+	set_status (text: STRING)
+		require
+			text /= Void
 		do
 			first_window.set_status_bar_text (text)
 		end
 
 	show_message (msg: STRING) is
+		require
+			msg /= Void
 		local
 			dialog: EV_INFORMATION_DIALOG
 		do
@@ -68,8 +72,12 @@ feature -- Status setting
 		local
 			i, j: INTEGER
 			ch: CHARACTER
+			font_for_text: EV_FONT
 		do
 			-- Background
+			field_size := (first_window.width - right_shift).min (first_window.height - lower_shift) * 2 * game_manager.dimension // (2 * game_manager.dimension + 1)
+			field_size := field_size // game_manager.dimension * game_manager.dimension -- To make size divisible by dimension
+
 			drawable_widget.set_foreground_color (background)
 			drawable_widget.fill_rectangle (0, 0, first_window.width, first_window.height)
 			drawable_widget.set_foreground_color (create {EV_COLOR}.make_with_rgb (0, 0, 0))
@@ -80,18 +88,22 @@ feature -- Status setting
 			until
 				i = game_manager.dimension + 1
 			loop
-				drawable_widget.draw_segment (i * field_size // game_manager.dimension, 0, i * field_size // game_manager.dimension, field_size)
-				drawable_widget.draw_segment (0, i * field_size // game_manager.dimension, field_size, i * field_size // game_manager.dimension)
+				drawable_widget.draw_segment (i * cell_size, 0, i * cell_size, field_size)
+				drawable_widget.draw_segment (0, i * cell_size, field_size, i * cell_size)
 				i := i + 1
 			end
 
 			-- Rows and columns titles
+			create font_for_text.default_create
+			font_for_text.set_height (cell_size // 3)
+			drawable_widget.set_font (font_for_text)
 			from
 				i := 1
 			until
 				i = game_manager.dimension + 1
 			loop
-				drawable_widget.draw_text (field_size + cell_size // 8 - 2, (game_manager.dimension - i) * cell_size + cell_size // 2 + 5, i.out)
+				drawable_widget.draw_text_top_left (field_size + (cell_size // 2 - font_for_text.string_size (i.out).integer_item (1)) // 2,
+						(game_manager.dimension - i) * cell_size + (cell_size - font_for_text.string_size (i.out).integer_item (2)) // 2, i.out)
 				i := i + 1
 			end
 
@@ -101,7 +113,8 @@ feature -- Status setting
 			until
 				ch = 'A' + game_manager.dimension
 			loop
-				drawable_widget.draw_text (i * cell_size + cell_size // 2 - 4, field_size + cell_size // 8 + 5, ch.out)
+				drawable_widget.draw_text_top_left (i * cell_size + (cell_size - font_for_text.string_size (ch.out).integer_item (1)) // 2,
+						field_size + (cell_size // 2 - font_for_text.string_size (ch.out).integer_item (2)) // 2, ch.out)
 				i := i + 1
 				ch := ch + 1
 			end
@@ -117,7 +130,7 @@ feature -- Status setting
 				until
 					j = game_manager.markers.item (i).count
 				loop
-					game_manager.markers.item (i).item (j).draw (drawable_widget, field_size // game_manager.dimension)
+					game_manager.markers.item (i).item (j).draw
 					j := j + 1
 				end
 				i := i + 1
@@ -135,10 +148,9 @@ feature {NONE} -- Initialization
 			drawable_widget.expose_actions.extend (agent draw)
 
 				-- create and initialize the first window.
-			create first_window.make (field_size + cell_size // 4 + 11, field_size + cell_size // 4 + 72, drawable_widget)
-
-				-- Show the first window.
-			first_window.show
+			field_size := 400
+			create first_window.make (field_size + cell_size // 2 + right_shift, field_size + cell_size // 2 + lower_shift, drawable_widget)
+			first_window.resize_actions.extend (agent draw)
 		end
 
 feature {NONE} -- Implementation
@@ -151,6 +163,13 @@ feature {NONE} -- Implementation
 			game_manager.make_move (x // (field_size // game_manager.dimension), y // (field_size // game_manager.dimension))
 		end
 
-	field_size: INTEGER is 400
+	field_size: INTEGER
+
+	right_shift: INTEGER is 21
+	lower_shift: INTEGER is 82
+
+invariant
+	drawable_widget /= Void
+	first_window /= Void
 
 end

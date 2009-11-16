@@ -49,14 +49,14 @@ feature {NONE} -- Initialization
 				end
 				i := i + 1
 			end
-			markers.item (3).item (3).show_hint (true)
-			markers.item (3).item (3).make_move
-			markers.item (3).item (4).show_hint (false)
-			markers.item (3).item (4).make_move
-			markers.item (4).item (3).show_hint (false)
-			markers.item (4).item (3).make_move
-			markers.item (4).item (4).show_hint (true)
-			markers.item (4).item (4).make_move
+			markers.item (dimension // 2 - 1).item (dimension // 2 - 1).show_hint (true)
+			markers.item (dimension // 2 - 1).item (dimension // 2 - 1).make_move
+			markers.item (dimension // 2 - 1).item (dimension // 2).show_hint (false)
+			markers.item (dimension // 2 - 1).item (dimension // 2).make_move
+			markers.item (dimension // 2).item (dimension // 2 - 1).show_hint (false)
+			markers.item (dimension // 2).item (dimension // 2 - 1).make_move
+			markers.item (dimension // 2).item (dimension // 2).show_hint (true)
+			markers.item (dimension // 2).item (dimension // 2).make_move
 			white_markers := 2
 			black_markers := 2
 			show_hints
@@ -65,21 +65,12 @@ feature {NONE} -- Initialization
 feature -- Access
 	markers: ARRAY [ARRAY [MARKER]]
 
-	dimension: INTEGER is 8
+	dimension: INTEGER is 6
 
 	is_game_over: BOOLEAN is
 		do
 			Result := not can_move and not can_opp_move
 		end
-
-	undo_last_move is
-		do
-			if (last_move /= Void) then
-				turn_state := last_move_state
-				markers.item (last_move.x).item (last_move.y)
-			end
-		end
-
 
 feature -- Change status
 	restart is
@@ -87,10 +78,14 @@ feature -- Change status
 		do
 			sd_restart.call ([], turn_state)
 			turn_state := sd_restart.next_state
+		ensure
+			turn_state = Black_turn
 		end
 
 	make_move (x, y: INTEGER) is
 			-- Put new marker at given position and repaint some markers
+		require
+			coordinates_in_range: x >= 0 and x < dimension and y >= 0 and y < dimension
 		local
 			flipped: LIST [MARKER]
 		do
@@ -198,8 +193,6 @@ feature {NONE} -- Implementation: Change status
 
 feature {GAME_MANAGER} -- Implementation
 
-	last_move: POSITION
-
 	white_markers: INTEGER
 
 	black_markers: INTEGER
@@ -272,6 +265,8 @@ feature {GAME_MANAGER} -- Implementation
 
 	flipped_markers (is_new_white: BOOLEAN; x, y: INTEGER): LIST [MARKER] is
 			-- Returns markers which would be flipped if new marker is put at (x, y)
+		require
+			coorinates_in_range: (x >= 0) and (x < dimension) and (y >= 0) and (y < dimension)
 		local
 			dx, dy: ARRAY [INTEGER] -- delta x and delta y
 			i, j, k: INTEGER
@@ -307,12 +302,11 @@ feature {GAME_MANAGER} -- Implementation
 				end
 				i := i + 1
 			end
+		ensure
+			not_void: Result /= Void
 		end
 
 feature {NONE} -- State dependent implementation
-
-	last_move_state: STATE
-
 	White_turn: STATE is once create Result.make ("White turn") end
 	Black_turn: STATE is once create Result.make ("Black turn") end
 	White_cant_move: STATE is once create Result.make ("White cant move") end
@@ -355,5 +349,11 @@ feature {NONE} -- State dependent implementation
 			Result.add_behavior (White_turn, agent true_agent, agent do_nothing, Black_turn)
 			Result.add_behavior (Black_turn, agent true_agent, agent do_nothing, White_turn)
 		end
+
+
+invariant
+	state_exists: turn_state /= Void
+	counters_in_range: white_markers >= 0 and white_markers <= dimension * dimension and
+		black_markers >= 0 and black_markers <= dimension * dimension
 
 end

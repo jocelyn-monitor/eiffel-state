@@ -18,9 +18,6 @@ feature -- Access
 	Menu_file_new_item: STRING is "Start new game"
 			-- String for menu "File/New"
 
-	Menu_file_undo_item: STRING is "Undo"
-			-- String for menu "File/Undo"
-
 	Menu_file_open_item: STRING is "&Open...%TCtrl+O"
 			-- String for menu "File/Open"
 
