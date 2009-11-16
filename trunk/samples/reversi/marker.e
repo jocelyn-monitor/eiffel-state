@@ -33,7 +33,7 @@ feature {GAME_MANAGER} -- Change status
 		do
 			sd_flip.call ([], color_state)
 			color_state := sd_flip.next_state
-			draw (gui_manager.drawable_widget, gui_manager.cell_size)
+			draw
 		end
 
 	show_hint (is_white_hint: BOOLEAN) is
@@ -41,7 +41,7 @@ feature {GAME_MANAGER} -- Change status
 		do
 			sd_show_hint.call ([is_white_hint], color_state)
 			color_state := sd_show_hint.next_state
-			draw (gui_manager.drawable_widget, gui_manager.cell_size)
+			draw
 		end
 
 	clear_hint is
@@ -49,7 +49,7 @@ feature {GAME_MANAGER} -- Change status
 		do
 			sd_clear_hint.call ([], color_state)
 			color_state := sd_clear_hint.next_state
-			draw (gui_manager.drawable_widget, gui_manager.cell_size)
+			draw
 		end
 
 	make_move is
@@ -57,7 +57,7 @@ feature {GAME_MANAGER} -- Change status
 		do
 			sd_move_made.call ([], color_state)
 			color_state := sd_move_made.next_state
-			draw (gui_manager.drawable_widget, gui_manager.cell_size)
+			draw
 		end
 
 feature -- Initialization
@@ -70,11 +70,14 @@ feature -- Initialization
 		end
 
 feature -- Output
-	draw (widget: EV_DRAWABLE; cell_size: INTEGER) is
-			-- Draw marker on the board
+	draw is
+			-- Draw marker on the board given cell size, left and upper shift
+		local
+			shift: INTEGER -- Distance between marker and nearest part of grid
 		do
-			widget.set_foreground_color (sd_color.item([], color_state))
-			widget.fill_ellipse (x * cell_size + 3, y * cell_size + 3, cell_size - 5, cell_size - 5)
+			gui_manager.drawable_widget.set_foreground_color (sd_color.item([], color_state))
+			shift := gui_manager.cell_size // 10
+			gui_manager.drawable_widget.fill_ellipse (gui_manager.cell_size * x + shift, gui_manager.cell_size * y + shift, gui_manager.cell_size - 2 * shift, gui_manager.cell_size - 2 * shift)
 		end
 
 feature {MARKER} -- State dependent features
@@ -164,6 +167,6 @@ feature {MARKER} -- State dependent features
 		end
 
 feature {NONE} -- Implementation
-	x, y: INTEGER -- Coordinates of marker
+	x, y: INTEGER -- Coordinates of marker on the board
 
 end
